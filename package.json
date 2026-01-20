@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "client",
   "private": true,
   "version": "0.0.0",
@@ -26,13 +25,4 @@
     "globals": "^16.4.0",
     "vite": "^7.1.7"
   }
-=======
-  "name": "demo-repo",
-  "version": "0.2.0",
-  "description": "A sample package.json",
-  "dependencies": {
-    "@primer/css": "17.0.1"
-  },
-  "license": "MIT"
->>>>>>> 2f3e2a4b4f86a0dde080c32257a6553754049f13
 }
