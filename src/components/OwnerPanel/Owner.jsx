@@ -6,6 +6,9 @@ import MyPropertiesContent from "./MyPropertiesContent";
 import AddPropertyContent from "./AddPropertyContent";
 import BookingsContent from "./BookingsContent";
 import ProfileContent from "./ProfileContent";
+import { logout } from "../../utils/frontAuth";
+import { useNavigate } from "react-router-dom";
+import{toast} from "react-toastify";
 
 const Owner = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -20,6 +23,8 @@ const Owner = () => {
 
   const normalize = (tab) => tab.toLowerCase().replace(/\s+/g, "-");
 
+  const navigate = useNavigate();
+
   return (
     <div className={styles.appWrapper}>
       <nav className={styles.headerNav}>
@@ -32,7 +37,17 @@ const Owner = () => {
             <span className={styles.welcomeText}>
               Welcome, <span className={styles.ownerName}>Aditya Sable</span>
             </span>
-            <button className="btn btn-outline-light btn-sm">Logout</button>
+            <button 
+              className={`btn btn-outline-light btn-sm ${styles.logoutBtn}`}
+              onClick={()=>
+              {
+                logout();
+                toast.info("Logged out successfully");
+                navigate("/");
+              }}
+              >
+                Logout
+              </button>
           </div>
         </div>
       </nav>

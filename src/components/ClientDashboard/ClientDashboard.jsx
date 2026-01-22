@@ -4,6 +4,9 @@ import styles from "./ClientDashboard.module.css";
 import SearchSection from "./SearchSection";
 import Listings from "./Listings";
 import { pgListings as initialPgListings } from "./pgData";
+import { logout } from "../../utils/frontAuth";
+import { useNavigate } from "react-router-dom";
+import{toast} from "react-toastify";
 
 const ClientDashboard = () => {
   const [selectedCity, setSelectedCity] = useState("");
@@ -12,6 +15,8 @@ const ClientDashboard = () => {
   const [foodIncluded, setFoodIncluded] = useState(false);
 
   const [pgListings] = useState(initialPgListings);
+
+  const navigate = useNavigate();
 
   return (
     <div className={styles.appWrapper}>
@@ -26,8 +31,17 @@ const ClientDashboard = () => {
             <span className={styles.welcomeText}>
               Welcome, <span className={styles.userName}>Sonam Chaurasiya</span>
             </span>
-            <button className="btn btn-outline-light btn-sm">Logout</button>
-          </div>
+            <button 
+              className={`btn btn-outline-danger btn-sm ${styles.logoutBtn}`}
+              onClick={()=>{
+                logout();
+                toast.info("Logged out successfully");
+                navigate("/");
+              }}
+            >
+              Logout
+            </button>
+            </div>
         </div>
       </nav>
 

@@ -8,6 +8,9 @@ import PropertiesContent from "./PropertiesContent";
 import BookingsContent from "./BookingsContent";
 import ReviewsContent from "./ReviewsContent";
 import RequestsContent from "./RequestsContent";
+import { logout } from "../../utils/frontAuth";
+import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -42,6 +45,8 @@ const AdminDashboard = () => {
     },
   ];
 
+  const navigate = useNavigate();
+
   return (
     <div className={styles.appWrapper}>
       <nav className={styles.headerNav}>
@@ -55,7 +60,12 @@ const AdminDashboard = () => {
               Welcome, <span className={styles.adminName}>Admin</span>
             </span>
             <button
-              className={`btn btn-outline-light btn-sm ${styles.logoutBtn}`}
+              className={`btn btn-sm border-danger text-danger ${styles.logoutBtn}`}
+              onClick={()=>{
+                logout();
+                toast.info("Logged out successfully");
+                navigate("/");
+              }}
             >
               Logout
             </button>
