@@ -53,6 +53,12 @@ const ClientRegister=()=>{
     return(
         <div className="register-page">
             <div className="register-card">
+                <button className="btn btn-link p-0 mb-3"
+                    style={{ textDecoration: "none", fontWeight: 500 }}
+                    onClick={() => navigate("/")}
+                >
+                ← Back
+                </button>
                 <h3 className="text-center mb-4">🏠Register, Join Residentia family!!</h3>
 
                 <input

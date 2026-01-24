@@ -97,7 +97,7 @@ export default function Home() {
                   <input
                     type="email"
                     className="form-control pg-input"
-                    placeholder="e.g. anand.kulkarni@gmail.com"
+                    placeholder="e.g. user@gmail.com"
                     value={findEmail}
                     onChange={(e) => setFindEmail(e.target.value)}
                   />
