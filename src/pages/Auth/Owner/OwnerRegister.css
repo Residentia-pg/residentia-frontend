@@ -1,0 +1,22 @@
+.register-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 750px;
+  margin-top: 2rem ;
+  margin-left: 18rem;
+}
+
+.owner-card {
+  max-width: 800px;
+}
