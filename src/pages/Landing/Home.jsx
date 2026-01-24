@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import "./Home.css";
+import { frontLogin } from "../../utils/frontAuth";
+import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify";
 
 export default function Home() {
   const [findEmail, setFindEmail] = useState("");
@@ -8,6 +11,8 @@ export default function Home() {
   const [listPassword, setListPassword] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+
+  const navigate = useNavigate();
 
   return (
     <div className="home-page">
@@ -92,7 +97,7 @@ export default function Home() {
                   <input
                     type="email"
                     className="form-control pg-input"
-                    placeholder="e.g. anand.kulkarni@gmail.com"
+                    placeholder="e.g. user@gmail.com"
                     value={findEmail}
                     onChange={(e) => setFindEmail(e.target.value)}
                   />
@@ -120,10 +125,26 @@ export default function Home() {
                   </div>
                 </div>
 
-                <button className="btn w-100 mb-2 pg-btn-primary">
+                <button 
+                  className="btn w-100 mb-2 pg-btn-primary"
+                  onClick={()=>{
+                    const res = frontLogin(findEmail,findPassword,"CLIENT");
+                    if(res.success) 
+                    {
+                      toast.success("Client Login Successful");
+                      navigate("/client");
+                    }
+                    else {
+                      toast.error(res.message);
+                    }
+                  }}
+                >
                   Login & Continue
                 </button>
-                <button className="btn w-100 pg-btn-outline">
+                <button 
+                  className="btn w-100 pg-btn-outline"
+                  onClick={()=>navigate("/register-client")}
+                >
                   Create a new account
                 </button>
               </div>
@@ -181,10 +202,26 @@ export default function Home() {
                   </small>
                 </div>
 
-                <button className="btn w-100 mb-2 pg-btn-primary">
+                <button 
+                  className="btn w-100 mb-2 pg-btn-primary"
+                  onClick={()=>{
+                    const res = frontLogin(listEmail,listPassword,"OWNER");
+                    if(res.success)
+                    {
+                      toast.success("Admin Login Successful");
+                      navigate("/owner-dashboard");
+                    }
+                    else{
+                      toast.error(res.message);
+                    } 
+                  }}
+                  >
                   Login as Owner
                 </button>
-                <button className="btn w-100 pg-btn-outline">
+                <button 
+                  className="btn w-100 pg-btn-outline"
+                  onClick={()=>navigate("/register-owner")}
+                  >
                   Register your PG
                 </button>
               </div>
@@ -236,7 +273,20 @@ export default function Home() {
                   />
                 </div>
 
-                <button className="btn w-100 pg-btn-primary">
+                <button 
+                  className="btn w-100 pg-btn-primary"
+                  onClick={()=>{
+                    const res = frontLogin(adminEmail,adminPassword,"ADMIN");
+                    if(res.success)
+                    {
+                      toast.success("Owner Login Successful");
+                      navigate("/admin-dashboard");
+                    }
+                    else{
+                      toast.error(res.message);
+                    } 
+                  }}
+                  >
                   Admin Login
                 </button>
                 <p className="admin-note">
