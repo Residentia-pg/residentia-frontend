@@ -141,7 +141,10 @@ export default function Home() {
                 >
                   Login & Continue
                 </button>
-                <button className="btn w-100 pg-btn-outline">
+                <button 
+                  className="btn w-100 pg-btn-outline"
+                  onClick={()=>navigate("/register-client")}
+                >
                   Create a new account
                 </button>
               </div>
@@ -215,7 +218,10 @@ export default function Home() {
                   >
                   Login as Owner
                 </button>
-                <button className="btn w-100 pg-btn-outline">
+                <button 
+                  className="btn w-100 pg-btn-outline"
+                  onClick={()=>navigate("/register-owner")}
+                  >
                   Register your PG
                 </button>
               </div>

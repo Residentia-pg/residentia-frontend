@@ -5,12 +5,20 @@ import ClientDashboard from "./components/ClientDashboard/ClientDashboard";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import Owner from "./components/OwnerPanel/Owner";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ClientRegister from "./pages/Auth/Client/ClientRegister";
+// import OwnerRegister from "./pages/Auth/OwnerRegister";
+
 
 function App() {
   return (
     <div>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
+        <Route path="/register-client" element={<ClientRegister/>}/>
+        {/* <Route path="/register-owner" element={<OwnerRegister/>}/> */}
+
+        {/* Protected Routes */}
         <Route 
           path="/client" 
           element={
