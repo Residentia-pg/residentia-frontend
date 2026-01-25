@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Owner.module.css";
 import { useNavigate } from "react-router-dom";
 
@@ -40,34 +40,39 @@ const BookingsContent = () => {
       <h2 className={styles.sectionTitle}>All Bookings</h2>
 
       <div className={styles.tableCard}>
-        <div className="table-responsive">
-          <table className="table table-dark table-hover">
-            <thead>
-              <tr>
-                <th className={styles.tableHead}>Property</th>
-                <th className={styles.tableHead}>Tenant</th>
-                <th className={styles.tableHead}>Phone</th>
-                <th className={styles.tableHead}>Amount</th>
-                <th className={styles.tableHead}>Date</th>
-                <th className={styles.tableHead}>Status</th>
-                <th className={styles.tableHead}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking.id}>
-                  <td className={styles.td}>{booking.property}</td>
-                  <td className={styles.td}>{booking.tenant}</td>
-                  <td className={styles.tdAlt}>{booking.phone}</td>
-                  <td className={styles.tdPrice}>{booking.amount}</td>
-                  <td className={styles.tdAlt}>{booking.date}</td>
-                  <td className={styles.td}>
-                    <span
-                      className={`${styles.statusBadge} ${
-                        booking.status === "Confirmed"
-                          ? styles.confirmed
-                          : styles.pending
-                      }`}
+        <table className={`table table-dark ${styles.noMargin}`}>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Tenant</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {bookings.map((b) => (
+              <tr key={b.id}>
+                <td>{b.property?.name}</td>
+                <td>{b.tenantName}</td>
+                <td>₹{b.amount}</td>
+                <td>
+                  <span
+                    className={
+                      b.status === "CONFIRMED"
+                        ? styles.confirmed
+                        : styles.pending
+                    }
+                  >
+                    {b.status}
+                  </span>
+                </td>
+                <td>
+                  {b.status === "PENDING" && (
+                    <button
+                      className="btn btn-success btn-sm"
+                      onClick={() => confirmBooking(b.id)}
                     >
                       {booking.status}
                     </span>
@@ -83,12 +88,13 @@ const BookingsContent = () => {
                     <button className="btn btn-sm btn-outline-success">
                       Confirm
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
       </div>
     </div>
   );

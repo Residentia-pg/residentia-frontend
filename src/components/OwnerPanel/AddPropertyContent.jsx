@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./Owner.module.css";
+import API from "../../api";
 
 const AddPropertyContent = () => {
   const [formData, setFormData] = useState({
@@ -18,26 +19,32 @@ const AddPropertyContent = () => {
     },
   });
 
-  const handleSubmit = () => {
-    console.log("Form submitted:", formData);
-    alert("Property added successfully!");
-    // reset if you want
-    setFormData({
-      name: "",
-      location: "",
-      price: "",
-      rooms: "",
-      sharing: "",
-      description: "",
-      amenities: {
-        wifi: false,
-        ac: false,
-        food: false,
-        laundry: false,
-        parking: false,
-      },
-    });
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const data = {
+    name: formData.name,
+    location: formData.location,
+    price: Number(formData.price),
+    totalRooms: Number(formData.rooms),
+    sharingType: formData.sharing,
+    description: formData.description,
+
+    wifi: formData.amenities.wifi,
+    ac: formData.amenities.ac,
+    food: formData.amenities.food,
+    laundry: formData.amenities.laundry,
+    parking: formData.amenities.parking
   };
+
+  try {
+    await API.post("/api/owner/properties", data);
+    alert("Property added successfully!");
+  } catch (err) {
+    alert("Failed to add property");
+    console.error(err.response?.data || err.message);
+  }
+};
 
   return (
     <div>
