@@ -1,94 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import API from "../../api";
 import styles from "./Owner.module.css";
 
 const ProfileContent = () => {
-  const [profile, setProfile] = useState({
-    name: "Aditya Sabale",
-    email: "Adii@gmail.com",
-    phone: "+91 9876543210",
-    city: "Mumbai",
+  const [owner, setOwner] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    city: ""
   });
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const res = await API.get("/api/owner/profile");
+      setOwner(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load profile");
+    }
+  };
+
+  const updateProfile = async () => {
+    try {
+      await API.put("/api/owner/profile", owner);
+      alert("Profile updated");
+    } catch (err) {
+      alert("Update failed");
+    }
+  };
 
   return (
     <div>
       <h2 className={styles.sectionTitle}>Profile Settings</h2>
 
-      <div className={styles.formCard}>
-        <div className="row g-3 mb-3">
-          <div className="col-md-6">
-            <label className={styles.label}>Full Name</label>
-            <input
-              className="form-control"
-              value={profile.name}
-              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
+      <input
+        className="form-control mb-2"
+        value={owner.name}
+        onChange={(e) => setOwner({ ...owner, name: e.target.value })}
+        placeholder="Name"
+      />
 
-          <div className="col-md-6">
-            <label className={styles.label}>Email</label>
-            <input
-              className="form-control"
-              value={profile.email}
-              onChange={(e) =>
-                setProfile({ ...profile, email: e.target.value })
-              }
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
-        </div>
+      <input
+        className="form-control mb-2"
+        value={owner.email}
+        onChange={(e) => setOwner({ ...owner, email: e.target.value })}
+        placeholder="Email"
+      />
 
-        <div className="row g-3 mb-3">
-          <div className="col-md-6">
-            <label className={styles.label}>Phone Number</label>
-            <input
-              className="form-control"
-              value={profile.phone}
-              onChange={(e) =>
-                setProfile({ ...profile, phone: e.target.value })
-              }
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
+      <input
+        className="form-control mb-2"
+        value={owner.phone}
+        onChange={(e) => setOwner({ ...owner, phone: e.target.value })}
+        placeholder="Phone"
+      />
 
-          <div className="col-md-6">
-            <label className={styles.label}>City</label>
-            <input
-              className="form-control"
-              value={profile.city}
-              onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
-        </div>
+      <input
+        className="form-control mb-2"
+        value={owner.city}
+        onChange={(e) => setOwner({ ...owner, city: e.target.value })}
+        placeholder="City"
+      />
 
-        <button
-          onClick={() => alert("Profile updated successfully!")}
-          className={`btn ${styles.primaryBtn}`}
-        >
-          Update Profile
-        </button>
-      </div>
+      <button className="btn btn-primary" onClick={updateProfile}>
+        Update Profile
+      </button>
     </div>
   );
 };

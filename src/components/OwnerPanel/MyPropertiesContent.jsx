@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Owner.module.css";
 import API from "../../api";
+import { useNavigate } from "react-router-dom";
 
 const MyPropertiesContent = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();   // 🔥 THIS WAS MISSING
 
   useEffect(() => {
     loadProperties();
@@ -28,9 +30,8 @@ const MyPropertiesContent = () => {
     try {
       await API.delete(`/api/owner/properties/${id}`);
 
-      // Remove from UI instantly (no reload)
-      setProperties(prev => prev.filter(p => p.id !== id));
-
+      // remove from UI instantly
+      setProperties((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       console.error(err);
       alert("Delete failed");
@@ -68,8 +69,11 @@ const MyPropertiesContent = () => {
                   </div>
 
                   <div className="d-flex gap-2">
-                    <button className="btn btn-outline-light btn-sm flex-grow-1">
-                      Edit
+                    <button
+                      className="btn btn-outline-light btn-sm flex-grow-1"
+                      onClick={() => navigate(`/owner/property/${p.id}`)}
+                    >
+                      View
                     </button>
 
                     <button
