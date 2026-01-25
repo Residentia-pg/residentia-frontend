@@ -1,37 +1,39 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Owner.module.css";
-import API from "../../api";
+import { useNavigate } from "react-router-dom";
 
 const BookingsContent = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadBookings();
-  }, []);
-
-  const loadBookings = async () => {
-    try {
-      const res = await API.get("/api/owner/bookings");
-      setBookings(res.data);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load bookings");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const confirmBooking = async (id) => {
-    try {
-      await API.put(`/api/owner/bookings/${id}/confirm`);
-      loadBookings(); // reload updated list
-    } catch (err) {
-      alert("Confirm failed");
-    }
-  };
-
-  if (loading) return <p className="text-center">Loading bookings...</p>;
+  const bookings = [
+    {
+      id: 1,
+      property: "Green Valley PG",
+      tenant: "Anand Kulkarni",
+      phone: "+91 9876543210",
+      amount: "₹12,000",
+      date: "Mar 15, 2024",
+      status: "Confirmed",
+    },
+    {
+      id: 2,
+      property: "Comfort Stay",
+      tenant: "Abhijeet Darade",
+      phone: "+91 9876543211",
+      amount: "₹15,000",
+      date: "Mar 20, 2024",
+      status: "Pending",
+    },
+    {
+      id: 3,
+      property: "Student Hub PG",
+      tenant: "POJO",
+      phone: "+91 9876543212",
+      amount: "₹8,500",
+      date: "Mar 25, 2024",
+      status: "Confirmed",
+    },
+  ];
+  
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -72,6 +74,18 @@ const BookingsContent = () => {
                       className="btn btn-success btn-sm"
                       onClick={() => confirmBooking(b.id)}
                     >
+                      {booking.status}
+                    </span>
+                  </td>
+                  <td className={styles.td}>
+                    <button className="btn btn-sm btn-outline-light me-2"
+                    onClick={() =>
+                        navigate(`/owner/client/${booking.id}`)
+                    }
+                    >
+                      View
+                    </button>
+                    <button className="btn btn-sm btn-outline-success">
                       Confirm
                     </button>
                   )}
