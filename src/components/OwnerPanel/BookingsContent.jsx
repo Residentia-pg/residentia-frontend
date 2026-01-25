@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./Owner.module.css";
+import { useNavigate } from "react-router-dom";
 
 const BookingsContent = () => {
   const bookings = [
@@ -31,6 +32,8 @@ const BookingsContent = () => {
       status: "Confirmed",
     },
   ];
+  
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -70,7 +73,11 @@ const BookingsContent = () => {
                     </span>
                   </td>
                   <td className={styles.td}>
-                    <button className="btn btn-sm btn-outline-light me-2">
+                    <button className="btn btn-sm btn-outline-light me-2"
+                    onClick={() =>
+                        navigate(`/owner/client/${booking.id}`)
+                    }
+                    >
                       View
                     </button>
                     <button className="btn btn-sm btn-outline-success">
