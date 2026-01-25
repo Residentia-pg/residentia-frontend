@@ -7,7 +7,7 @@ import Owner from "./components/OwnerPanel/Owner";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ClientRegister from "./pages/Auth/Client/ClientRegister";
 import OwnerRegister from "./pages/Auth/Owner/OwnerRegister";
-
+import ClientView from "./components/OwnerPanel/ClientView";
 
 function App() {
   return (
@@ -44,6 +44,14 @@ function App() {
             <Owner />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/owner/client/:bookingId"
+          element={
+            <ProtectedRoute role="OWNER">
+              <ClientView />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </div>
