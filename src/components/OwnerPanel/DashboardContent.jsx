@@ -1,8 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Owner.module.css";
-import { stats, recentBookings } from "./ownerData";
+import API from "../../api";
 
 const DashboardContent = () => {
+  const [stats, setStats] = useState([]);
+  const [recentBookings, setRecentBookings] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const propertiesRes = await API.get("/api/owner/properties");
+        const bookingsRes = await API.get("/api/owner/bookings");
+
+        const bookings = bookingsRes.data;
+        const confirmed = bookings.filter(b => b.status === "CONFIRMED");
+        const revenue = confirmed.reduce((sum, b) => sum + b.amount, 0);
+
+        setStats([
+          { label: "Properties", value: propertiesRes.data.length, color: "#38bdf8" },
+          { label: "Bookings", value: bookings.length, color: "#22c55e" },
+          { label: "Confirmed", value: confirmed.length, color: "#facc15" },
+          { label: "Revenue", value: "₹" + revenue, color: "#a78bfa" }
+        ]);
+
+        setRecentBookings(bookings.slice(0, 5));
+      } catch (err) {
+        console.error("Dashboard load failed", err);
+      }
+    };
+
+    loadData();
+  }, []);
+
   return (
     <div>
       <h2 className={styles.sectionTitle}>Dashboard Overview</h2>
@@ -36,13 +65,13 @@ const DashboardContent = () => {
             <tbody>
               {recentBookings.map((booking, idx) => (
                 <tr key={idx} className={styles.tr}>
-                  <td className={styles.td}>{booking.property}</td>
-                  <td className={styles.td}>{booking.tenant}</td>
+                  <td className={styles.td}>{booking.property?.name}</td>
+                  <td className={styles.td}>{booking.tenantName}</td>
                   <td className={styles.td}>{booking.amount}</td>
                   <td className={styles.td}>
                     <span
                       className={`${styles.statusBadge} ${
-                        booking.status === "Confirmed"
+                        booking.status === "CONFIRMED"
                           ? styles.confirmed
                           : styles.pending
                       }`}
