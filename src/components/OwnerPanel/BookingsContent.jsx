@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Owner.module.css";
 import { useNavigate } from "react-router-dom";
 
 const BookingsContent = () => {
-  const bookings = [
+  // Using state so that the 'Confirm' action can actually update the UI
+  const [bookings, setBookings] = useState([
     {
       id: 1,
       property: "Green Valley PG",
@@ -31,9 +32,19 @@ const BookingsContent = () => {
       date: "Mar 25, 2024",
       status: "Confirmed",
     },
-  ];
-  
+  ]);
+
   const navigate = useNavigate();
+
+  // Function to handle the confirmation logic
+  const confirmBooking = (id) => {
+    setBookings((prevBookings) =>
+      prevBookings.map((b) =>
+        b.id === id ? { ...b, status: "Confirmed" } : b
+      )
+    );
+    console.log(`Booking ${id} confirmed!`);
+  };
 
   return (
     <div>
@@ -54,13 +65,14 @@ const BookingsContent = () => {
           <tbody>
             {bookings.map((b) => (
               <tr key={b.id}>
-                <td>{b.property?.name}</td>
-                <td>{b.tenantName}</td>
-                <td>₹{b.amount}</td>
+                {/* Fixed: Accessing b.property directly based on your array */}
+                <td>{b.property}</td>
+                <td>{b.tenant}</td>
+                <td>{b.amount}</td>
                 <td>
                   <span
                     className={
-                      b.status === "CONFIRMED"
+                      b.status === "Confirmed"
                         ? styles.confirmed
                         : styles.pending
                     }
@@ -69,31 +81,28 @@ const BookingsContent = () => {
                   </span>
                 </td>
                 <td>
-                  {b.status === "PENDING" && (
+                  <div className="d-flex align-items-center">
                     <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => confirmBooking(b.id)}
-                    >
-                      {booking.status}
-                    </span>
-                  </td>
-                  <td className={styles.td}>
-                    <button className="btn btn-sm btn-outline-light me-2"
-                    onClick={() =>
-                        navigate(`/owner/client/${booking.id}`)
-                    }
+                      className="btn btn-sm btn-outline-light me-2"
+                      onClick={() => navigate(`/owner/client/${b.id}`)}
                     >
                       View
                     </button>
-                    <button className="btn btn-sm btn-outline-success">
-                      Confirm
-                    </button>
-                  )}
+
+                    {/* Only show Confirm button if status is Pending */}
+                    {b.status === "Pending" && (
+                      <button
+                        className="btn btn-sm btn-outline-success"
+                        onClick={() => confirmBooking(b.id)}
+                      >
+                        Confirm
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
     </div>

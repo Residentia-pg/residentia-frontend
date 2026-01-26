@@ -34,7 +34,7 @@ const ReviewsContent = () => {
       <h2 className={styles.sectionTitle}>Reviews</h2>
 
       <div className={styles.activityContainer}>
-        {reviews.map((review, index) => (
+        {reviews.map((review) => (
           <div key={review.id} className={styles.activityItem}>
             <div className="d-flex justify-content-between align-items-start mb-3">
               <div>

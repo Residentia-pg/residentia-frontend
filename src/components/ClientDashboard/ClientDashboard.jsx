@@ -1,75 +1,29 @@
-import React, { useState } from "react";
-import styles from "./ClientDashboard.module.css";
-
-import SearchSection from "./SearchSection";
-import Listings from "./Listings";
-import { pgListings as initialPgListings } from "./pgData";
-import { logout } from "../../utils/frontAuth";
-import { useNavigate } from "react-router-dom";
-import{toast} from "react-toastify";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ClientDashboard = () => {
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedBudget, setSelectedBudget] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [foodIncluded, setFoodIncluded] = useState(false);
+  const [pgs, setPgs] = useState([]);
 
-  const [pgListings] = useState(initialPgListings);
-
-  const navigate = useNavigate();
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/pgs/all")
+      .then(res => setPgs(res.data))
+      .catch(err => console.error("Data Fetch Error:", err));
+  }, []);
 
   return (
-    <div className={styles.appWrapper}>
-      {/* Header */}
-      <nav className={styles.headerNav}>
-        <div className="d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center">
-            <span className={styles.logoEmoji}>🏠</span>
-            <h1 className={styles.brandTitle}>PG Finder</h1>
-          </div>
-          <div className="d-flex align-items-center gap-3">
-            <span className={styles.welcomeText}>
-              Welcome, <span className={styles.userName}>Sonam Chaurasiya</span>
-            </span>
-            <button 
-              className={`btn btn-outline-danger btn-sm ${styles.logoutBtn}`}
-              onClick={()=>{
-                logout();
-                toast.info("Logged out successfully");
-                navigate("/");
-              }}
-            >
-              Logout
-            </button>
+    <div className="container mt-5">
+      <h2 className="text-center text-white mb-4">Available PGs</h2>
+      <div className="row">
+        {pgs.map((pg) => (
+          <div className="col-md-4 mb-4" key={pg.id}>
+            <div className="card shadow p-3">
+              <h4>{pg.propertyName}</h4>
+              <p className="text-muted">📍 {pg.city}</p>
+              <h5 className="text-success">Rent: ₹{pg.rentAmount}</h5>
+              <button className="btn btn-primary w-100">Book Now</button>
             </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className={`container py-5 ${styles.container}`}>
-        <SearchSection
-          selectedCity={selectedCity}
-          setSelectedCity={setSelectedCity}
-          selectedBudget={selectedBudget}
-          setSelectedBudget={setSelectedBudget}
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
-          foodIncluded={foodIncluded}
-          setFoodIncluded={setFoodIncluded}
-        />
-
-        <section>
-          <h3 className={styles.sectionHeading}>Available PGs</h3>
-          <Listings
-            pgListings={pgListings}
-            filter={{
-              selectedCity,
-              selectedBudget,
-              selectedType,
-              foodIncluded,
-            }}
-          />
-        </section>
+          </div>
+        ))}
       </div>
     </div>
   );

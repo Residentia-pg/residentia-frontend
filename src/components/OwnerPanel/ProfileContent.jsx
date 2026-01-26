@@ -28,7 +28,7 @@ const ProfileContent = () => {
     try {
       await API.put("/api/owner/profile", owner);
       alert("Profile updated");
-    } catch (err) {
+    } catch {
       alert("Update failed");
     }
   };

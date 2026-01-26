@@ -1,142 +1,131 @@
-import React,{useState} from"react";
-import{toast} from "react-toastify";
-import {useNavigate} from "react-router-dom";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./ClientRegister.css";
 
-const ClientRegister=()=>{
-    const[form,setForm]  =useState({
-        name:"",
-        email:"",
-        mobile:"",
-        dob:"",
-        gender:"",
-        occupation:"",
-        address:"",
-        password:"",
-        confirmPassword:"",
-    });
+const ClientRegister = () => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleChange = (e) =>{
-        setForm({...form,[e.target.name]:e.target.value});
-    };
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    const handleRegister = () =>{
-        const{name,email,mobile,dob,gender,occupation,address,password,confirmPassword} = form;
+  const handleRegister = async () => {
+    const { name, email, mobile, password, confirmPassword } = form;
 
-        if(!name || !email || !mobile || !dob ||!gender ||!occupation ||!address || !password ||!confirmPassword){
-            toast.error("All fields are required");
-            return;
-        }
+    if (!name || !email || !mobile || !password) {
+      toast.error("All fields are required");
+      return;
+    }
 
-        if (mobile.length < 10) {
-            toast.error("Enter valid mobile number");
-            return;
-        }
+    if (password !== confirmPassword) {
+      toast.error("Password mismatch");
+      return;
+    }
 
-        if (password.length < 6) {
-            toast.error("Password must be at least 6 characters");
-            return;
-        }
+    try {
+      const userData = {
+        name,
+        email,
+        mobileNumber: mobile,
+        passwordHash: password,
+      };
 
-        if(password != confirmPassword)
-        {
-            toast.error("password mismatch");
-            return;
-        }
+      const response = await axios.post(
+        "http://localhost:8080/api/auth/register",
+        userData
+      );
 
-        toast.success("Client registered Successfully!!!");
-        navigate("/");
-    };
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Client registered successfully!");
+        navigate("/client");
+      }
+    } catch {
+      toast.error("Registration Failed!");
+    }
+  };
 
-    return(
-        <div className="register-page">
-            <div className="register-card">
-                <button className="btn btn-link p-0 mb-3"
-                    style={{ textDecoration: "none", fontWeight: 500 }}
-                    onClick={() => navigate("/")}
-                >
-                ← Back
-                </button>
-                <h3 className="text-center mb-4">🏠Register, Join Residentia family!!</h3>
-
-                <input
-                    name="name"
-                    placeholder="Full Name"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
-
-                <input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
-
-                <input
-                    name="mobile"
-                    placeholder="Mobile Number"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
-
-                <input
-                    name="dob"
-                    type="date"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
-
-                <select
-                    name="gender"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                >
-                    <option value="">Select Gender</option>
-                    <option value="MALE">Male</option>
-                    <option value="FEMALE">Female</option>
-                    <option value="OTHER">Other</option>
-                </select>
-
-                <input
-                    name="occupation"
-                    placeholder="Occupation"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
-
-                <textarea
-                    name="address"
-                    placeholder="Address"
-                    className="form-control mb-3"
-                    rows="3"
-                    onChange={handleChange}
-                />
-
-                <input
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
-
-                <input
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Confirm Password"
-                    className="form-control mb-4"
-                    onChange={handleChange}
-                />
-                <button className="btn btn-primary w-100" onClick={handleRegister}>
-                    Register as Client
-                </button>
+  return (
+    <div className="register-page">
+      <div className="register-card">
+        <div className="card-header">
+          <button className="back-btn" onClick={() => navigate("/")}>
+            ← Back
+          </button>
+          <h2>Create Account</h2>
+          <p className="subtitle">Join us to find your perfect PG</p>
         </div>
+
+        <div className="form-container">
+          <div className="form-group">
+            <label>Full Name</label>
+            <input
+              name="name"
+              placeholder="e.g. John Doe"
+              className="form-input"
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Email Address</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="e.g. john@example.com"
+              className="form-input"
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Mobile Number</label>
+            <input
+              name="mobile"
+              placeholder="e.g. 9876543210"
+              className="form-input"
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              className="form-input"
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              name="confirmPassword"
+              type="password"
+              placeholder="••••••••"
+              className="form-input"
+              onChange={handleChange}
+            />
+          </div>
+
+          <button className="register-btn" onClick={handleRegister}>
+            Get Started
+          </button>
+        </div>
+      </div>
     </div>
-    );
+  );
 };
 
 export default ClientRegister;

@@ -25,21 +25,21 @@ const OwnerRegister = () => {
   };
 
   const handleRegister = () => {
-    const{name,email,mobile,managementCompany,address,aadharOrPan,identityDocUrl,bankAccount,ifsc,password,confirmPassword} = form;
+    const { name, email, mobile, managementCompany, address, password, confirmPassword } = form;
 
-    if (!email || !password || !mobile || ! name || !managementCompany||!address || !confirmPassword) {
+    if (!email || !password || !mobile || !name || !managementCompany || !address || !confirmPassword) {
       toast.error("Required fields missing");
       return;
     }
 
     if (mobile.length < 10) {
-        toast.error("Enter valid mobile number");
-        return;
+      toast.error("Enter valid mobile number");
+      return;
     }
 
     if (password.length < 6) {
-        toast.error("Password must be at least 6 characters");
-        return;
+      toast.error("Password must be at least 6 characters");
+      return;
     }
 
     if (form.password !== form.confirmPassword) {
@@ -56,15 +56,15 @@ const OwnerRegister = () => {
   return (
     <div className="owner-register-page">
       <div className="register-card">
-         <button className="btn btn-link p-0 mb-3"
-            style={{ textDecoration: "none", fontWeight: 500 }}
-            onClick={() => navigate("/")}
+        <button className="btn btn-link p-0 mb-3"
+          style={{ textDecoration: "none", fontWeight: 500 }}
+          onClick={() => navigate("/")}
         >
-         ← Back
+          ← Back
         </button>
         <h3 className="text-center mb-4">🏠Register, Join Residentia family!!</h3>
 
-         <div className="row">
+        <div className="row">
           <div className="col-md-6 mb-3">
             <input
               name="name"
