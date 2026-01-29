@@ -1,0 +1,65 @@
+.aboutPage {
+  background-color: #ffffff;
+  min-height: 90vh;
+  padding: 5px 20px;
+}
+
+/* OUTSIDE TITLE */
+.pageTitle {
+  text-align: center;
+  font-size: 2.3rem;
+  margin-bottom: 30px;
+  color: #22c55e;
+  font-weight: 700;
+}
+
+/* CARD CONTAINER */
+.container {
+  max-width: 700px;
+  margin: auto;
+}
+
+.card {
+  background: linear-gradient(135deg, #3b82f6, #3b82f6);
+  border: 2px solid #ffffff;
+  border-radius: 18px;
+  padding: 35px;
+  color: #ffffff;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+.section {
+  margin-bottom: 28px;
+}
+
+.section h2 {
+  color: #dbeafe;
+  margin-bottom: 8px;
+}
+
+.section p,
+.section li {
+  line-height: 1.6;
+}
+
+.intro {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+.backBtn {
+  background: transparent;
+  border: 2px solid #0f3d91;
+  color: #0f3d91;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+.backBtn:hover {
+  background-color: #0f3d91;
+  color: #ffffff;
+  transition: 0.3s ease;
+}

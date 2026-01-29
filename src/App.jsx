@@ -1,60 +1,91 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
+
+// ===== PAGES =====
 import Home from "./pages/Landing/Home";
+import ClientRegister from "./pages/Auth/Client/ClientRegister";
+import OwnerRegister from "./pages/Auth/Owner/OwnerRegister";
+import AdminLogin from "./pages/Auth/Admin/AdminLogin";
+import About from "./pages/staticPages/About";
+import Contact from "./pages/staticPages/Contact";
+import Help from "./pages/staticPages/Help";
+
+// ===== COMPONENTS =====
 import ClientDashboard from "./components/ClientDashboard/ClientDashboard";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import Owner from "./components/OwnerPanel/Owner";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import ClientRegister from "./pages/Auth/Client/ClientRegister";
-import OwnerRegister from "./pages/Auth/Owner/OwnerRegister";
 import ClientView from "./components/OwnerPanel/ClientView";
+import ViewProperty from "./components/OwnerPanel/ViewProperty";
+
+// ===== ROUTES =====
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   return (
-    <div>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/register-client" element={<ClientRegister/>}/>
-        <Route path="/register-owner" element={<OwnerRegister/>}/>
+    <Routes>
+      {/* ===== PUBLIC ROUTES ===== */}
+      <Route path="/" element={<Home />} />
+      <Route path="/about-us" element={<About />} />
+      <Route path="/contact-us" element={<Contact />} />
+      <Route path="/help" element={<Help />} />
+      <Route path="/register-client" element={<ClientRegister />} />
+      <Route path="/register-owner" element={<OwnerRegister />} />
+      <Route path="/admin-login" element={<AdminLogin />} />
 
-        {/* Protected Routes */}
-        <Route 
-          path="/client" 
-          element={
-            <ProtectedRoute role="CLIENT">
-          <ClientDashboard />
-          </ProtectedRoute>
-          }
-        />
-
-        <Route 
-          path="/admin-dashboard" 
-          element={
-            <ProtectedRoute role="ADMIN">
+      {/* ===== ADMIN ROUTES ===== */}
+      <Route
+        path="/admin-dashboard"
+        element={
+          <ProtectedRoute role="ADMIN">
             <AdminDashboard />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/owner-dashboard" 
-          element={
-            <ProtectedRoute role="OWNER">
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ===== CLIENT ROUTES ===== */}
+      <Route
+        path="/client"
+        element={
+          <ProtectedRoute role="CLIENT">
+            <ClientDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ===== ADMIN ROUTES (FROM V2) ===== */}
+      
+
+      {/* ===== OWNER ROUTES (FROM V1) ===== */}
+      <Route
+        path="/owner-dashboard"
+        element={
+          <ProtectedRoute role="OWNER">
             <Owner />
-            </ProtectedRoute>
-          } 
-        />
-        <Route
-          path="/owner/client/:bookingId"
-          element={
-            <ProtectedRoute role="OWNER">
-              <ClientView />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </div>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/owner/client/:bookingId"
+        element={
+          <ProtectedRoute role="OWNER">
+            <ClientView />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/owner/view/:id"
+        element={
+          <ProtectedRoute role="OWNER">
+            <ViewProperty />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Home />} />
+    </Routes>
   );
 }
 

@@ -1,94 +1,96 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Owner.module.css";
+import API from "../../api/api";
 import { useNavigate } from "react-router-dom";
 
 const BookingsContent = () => {
-  const bookings = [
-    {
-      id: 1,
-      property: "Green Valley PG",
-      tenant: "Anand Kulkarni",
-      phone: "+91 9876543210",
-      amount: "₹12,000",
-      date: "Mar 15, 2024",
-      status: "Confirmed",
-    },
-    {
-      id: 2,
-      property: "Comfort Stay",
-      tenant: "Abhijeet Darade",
-      phone: "+91 9876543211",
-      amount: "₹15,000",
-      date: "Mar 20, 2024",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      property: "Student Hub PG",
-      tenant: "POJO",
-      phone: "+91 9876543212",
-      amount: "₹8,500",
-      date: "Mar 25, 2024",
-      status: "Confirmed",
-    },
-  ];
-  
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadBookings();
+  }, []);
+
+  const loadBookings = async () => {
+    try {
+      const res = await API.get("/api/owner/bookings");
+      setBookings(res.data);
+    } catch (err) {
+      alert("Failed to load bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmBooking = async (id) => {
+    try {
+      await API.put(`/api/owner/bookings/${id}/confirm`);
+      loadBookings(); // refresh list
+    } catch (err) {
+      alert("Confirm failed");
+    }
+  };
+
+  if (loading) return <p className="text-center">Loading bookings...</p>;
 
   return (
     <div>
       <h2 className={styles.sectionTitle}>All Bookings</h2>
 
       <div className={styles.tableCard}>
-        <div className="table-responsive">
-          <table className="table table-dark table-hover">
-            <thead>
-              <tr>
-                <th className={styles.tableHead}>Property</th>
-                <th className={styles.tableHead}>Tenant</th>
-                <th className={styles.tableHead}>Phone</th>
-                <th className={styles.tableHead}>Amount</th>
-                <th className={styles.tableHead}>Date</th>
-                <th className={styles.tableHead}>Status</th>
-                <th className={styles.tableHead}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking.id}>
-                  <td className={styles.td}>{booking.property}</td>
-                  <td className={styles.td}>{booking.tenant}</td>
-                  <td className={styles.tdAlt}>{booking.phone}</td>
-                  <td className={styles.tdPrice}>{booking.amount}</td>
-                  <td className={styles.tdAlt}>{booking.date}</td>
-                  <td className={styles.td}>
-                    <span
-                      className={`${styles.statusBadge} ${
-                        booking.status === "Confirmed"
-                          ? styles.confirmed
-                          : styles.pending
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
-                  </td>
-                  <td className={styles.td}>
-                    <button className="btn btn-sm btn-outline-light me-2"
-                    onClick={() =>
-                        navigate(`/owner/client/${booking.id}`)
+        <table className={`table table-dark ${styles.noMargin}`}>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Tenant</th>
+              <th>Phone</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {bookings.map((b) => (
+              <tr key={b.id}>
+                <td>{b.property?.name}</td>
+                <td>{b.tenantName}</td>
+                <td>{b.tenantPhone}</td>
+                <td>₹{b.amount}</td>
+                <td>
+                  <span
+                    className={
+                      b.status === "CONFIRMED"
+                        ? styles.confirmed
+                        : styles.pending
                     }
+                  >
+                    {b.status}
+                  </span>
+                </td>
+                <td className="d-flex gap-2">
+                  <button
+                    className="btn btn-sm btn-outline-light"
+                    onClick={() => navigate(`/owner/client/${b.id}`)}
+                  >
+                    View
+                  </button>
+
+                  {b.status === "PENDING" && (
+                    <button
+                      className="btn btn-sm btn-success"
+                      onClick={() => confirmBooking(b.id)}
                     >
-                      View
-                    </button>
-                    <button className="btn btn-sm btn-outline-success">
                       Confirm
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
       </div>
     </div>
   );

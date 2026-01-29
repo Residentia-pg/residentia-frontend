@@ -1,0 +1,66 @@
+.helpPage {
+  background-color: #ffffff;
+  min-height: 100vh;
+  padding: 50px 20px;
+}
+
+/* BACK BUTTON */
+.backBtn {
+  background: transparent;
+  border: 2px solid #0f3d91;
+  color: #0f3d91;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.backBtn:hover {
+  background-color: #0f3d91;
+  color: #ffffff;
+  transition: 0.3s ease;
+}
+
+/* TITLE */
+.pageTitle {
+  text-align: center;
+  font-size: 2.6rem;
+  margin-bottom: 30px;
+  color: #22c55e;
+  font-weight: 700;
+}
+
+/* CARD */
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+.card {
+  background: linear-gradient(135deg, #0f3d91, #1e5ad7);
+  border: 2px solid #ffffff;
+  border-radius: 18px;
+  padding: 35px;
+  color: #ffffff;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+/* FAQ */
+.faqItem {
+  margin-bottom: 25px;
+}
+
+.faqItem h3 {
+  margin-bottom: 8px;
+  color: #dbeafe;
+}
+
+.faqItem p {
+  line-height: 1.6;
+}

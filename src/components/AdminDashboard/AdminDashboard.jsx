@@ -10,10 +10,11 @@ import ReviewsContent from "./ReviewsContent";
 import RequestsContent from "./RequestsContent";
 import { logout } from "../../utils/frontAuth";
 import { useNavigate } from "react-router-dom";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const navigate = useNavigate();
 
   const menuItems = [
     { id: "dashboard", icon: "📊", label: "Dashboard" },
@@ -24,28 +25,6 @@ const AdminDashboard = () => {
     { id: "reviews", icon: "⭐", label: "Reviews" },
     { id: "requests", icon: "📋", label: "Requests" },
   ];
-
-  const stats = [
-    { value: "1,247", label: "Total Users", color: "#4fd1c5" },
-    { value: "89", label: "PG Owners", color: "#4fd1c5" },
-    { value: "456", label: "Properties", color: "#4fd1c5" },
-    { value: "23", label: "Pending Verifications", color: "#4fd1c5" },
-  ];
-
-  const activities = [
-    {
-      title: "New PG Owner Registration",
-      description: "Sarah Wilson registered as PG Owner",
-      time: "2 hours ago",
-    },
-    {
-      title: "Property Verification",
-      description: "Green Valley PG approved",
-      time: "4 hours ago",
-    },
-  ];
-
-  const navigate = useNavigate();
 
   return (
     <div className={styles.appWrapper}>
@@ -61,7 +40,7 @@ const AdminDashboard = () => {
             </span>
             <button
               className={`btn btn-sm border-danger text-danger ${styles.logoutBtn}`}
-              onClick={()=>{
+              onClick={() => {
                 logout();
                 toast.info("Logged out successfully");
                 navigate("/");
@@ -73,10 +52,7 @@ const AdminDashboard = () => {
         </div>
       </nav>
 
-      <div
-        className="d-flex"
-        style={{ height: "calc(100vh - 73px)", overflow: "hidden" }}
-      >
+      <div className="d-flex" style={{ height: "calc(100vh - 73px)", overflow: "hidden" }}>
         <aside className={styles.sidebar}>
           {menuItems.map((item) => {
             const active = activeTab === item.id;
@@ -84,15 +60,7 @@ const AdminDashboard = () => {
               <div
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`${styles.menuItem} ${
-                  active ? styles.menuItemActive : ""
-                }`}
-                onMouseEnter={(e) => {
-                  if (!active) e.currentTarget.classList.add(styles.hovered);
-                }}
-                onMouseLeave={(e) => {
-                  if (!active) e.currentTarget.classList.remove(styles.hovered);
-                }}
+                className={`${styles.menuItem} ${active ? styles.menuItemActive : ""}`}
               >
                 <span className={styles.menuIcon}>{item.icon}</span>
                 <span>{item.label}</span>
@@ -102,9 +70,7 @@ const AdminDashboard = () => {
         </aside>
 
         <main className={styles.mainContent}>
-          {activeTab === "dashboard" && (
-            <DashboardContent stats={stats} activities={activities} />
-          )}
+          {activeTab === "dashboard" && <DashboardContent />}
           {activeTab === "users" && <UsersContent />}
           {activeTab === "owners" && <OwnersContent />}
           {activeTab === "properties" && <PropertiesContent />}

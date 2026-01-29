@@ -1,94 +1,129 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import API from "../../api/api";
+import { toast } from "react-toastify";
 import styles from "./Owner.module.css";
 
 const ProfileContent = () => {
-  const [profile, setProfile] = useState({
-    name: "Aditya Sabale",
-    email: "Adii@gmail.com",
-    phone: "+91 9876543210",
-    city: "Mumbai",
+  const [owner, setOwner] = useState({
+    id: "",
+    name: "",
+    email: "",
+    mobileNumber: "",
+    businessName: "",
+    address: "",
+    alternateContact: "",
+    verificationStatus: "",
+    isActive: false,
   });
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      const res = await API.get("/api/owner/profile");
+      setOwner(res.data);
+    } catch (err) {
+      toast.error(
+        "Failed to load profile: " +
+          (err.response?.data?.message || err.message)
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async () => {
+    try {
+      await API.put("/api/owner/profile", owner);
+      toast.success("Profile updated successfully!");
+    } catch (err) {
+      toast.error(
+        "Update failed: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
+  if (loading) {
+    return <p>Loading profile...</p>;
+  }
 
   return (
     <div>
       <h2 className={styles.sectionTitle}>Profile Settings</h2>
 
-      <div className={styles.formCard}>
-        <div className="row g-3 mb-3">
-          <div className="col-md-6">
-            <label className={styles.label}>Full Name</label>
-            <input
-              className="form-control"
-              value={profile.name}
-              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
-
-          <div className="col-md-6">
-            <label className={styles.label}>Email</label>
-            <input
-              className="form-control"
-              value={profile.email}
-              onChange={(e) =>
-                setProfile({ ...profile, email: e.target.value })
-              }
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="row g-3 mb-3">
-          <div className="col-md-6">
-            <label className={styles.label}>Phone Number</label>
-            <input
-              className="form-control"
-              value={profile.phone}
-              onChange={(e) =>
-                setProfile({ ...profile, phone: e.target.value })
-              }
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
-
-          <div className="col-md-6">
-            <label className={styles.label}>City</label>
-            <input
-              className="form-control"
-              value={profile.city}
-              onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-              style={{
-                backgroundColor: "#ffffff",
-                borderColor: "#d1d5db",
-                color: "#374151",
-                fontSize: 14,
-              }}
-            />
-          </div>
-        </div>
-
-        <button
-          onClick={() => alert("Profile updated successfully!")}
-          className={`btn ${styles.primaryBtn}`}
-        >
-          Update Profile
-        </button>
+      <div style={{ marginBottom: "20px" }}>
+        <label>Full Name</label>
+        <input
+          className="form-control"
+          value={owner.name || ""}
+          onChange={(e) =>
+            setOwner({ ...owner, name: e.target.value })
+          }
+        />
       </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label>Email</label>
+        <input
+          className="form-control"
+          value={owner.email || ""}
+          disabled
+        />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label>Mobile Number</label>
+        <input
+          className="form-control"
+          value={owner.mobileNumber || ""}
+          onChange={(e) =>
+            setOwner({ ...owner, mobileNumber: e.target.value })
+          }
+        />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label>Business Name</label>
+        <input
+          className="form-control"
+          value={owner.businessName || ""}
+          onChange={(e) =>
+            setOwner({ ...owner, businessName: e.target.value })
+          }
+        />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label>Address</label>
+        <input
+          className="form-control"
+          value={owner.address || ""}
+          onChange={(e) =>
+            setOwner({ ...owner, address: e.target.value })
+          }
+        />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label>Alternate Contact</label>
+        <input
+          className="form-control"
+          value={owner.alternateContact || ""}
+          onChange={(e) =>
+            setOwner({ ...owner, alternateContact: e.target.value })
+          }
+        />
+      </div>
+
+      <button className="btn btn-primary" onClick={updateProfile}>
+        Update Profile
+      </button>
     </div>
   );
 };

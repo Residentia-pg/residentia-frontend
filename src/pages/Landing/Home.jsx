@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "./Home.css";
-import { frontLogin } from "../../utils/frontAuth";
 import { useNavigate } from "react-router-dom";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
+import API from "../../api/api";
+import { frontLogin } from "../../utils/frontAuth";
 
 export default function Home() {
   const [findEmail, setFindEmail] = useState("");
@@ -11,37 +12,114 @@ export default function Home() {
   const [listPassword, setListPassword] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    toast.info("You are already on the Login / Sign Up page");
+  };
+
+  // ===== CLIENT LOGIN =====
+  const handleClientLogin = async () => {
+    if (!findEmail || !findPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await frontLogin(findEmail, findPassword, "CLIENT");
+      if (result.success) {
+        toast.success("Client Login Successful");
+        navigate("/client");
+      } else {
+        toast.error(result.message || "Login failed");
+      }
+    } catch (error) {
+      toast.error(error.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ===== OWNER LOGIN =====
+  const handleOwnerLogin = async () => {
+    if (!listEmail || !listPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await frontLogin(listEmail, listPassword, "OWNER");
+      if (result.success) {
+        toast.success("Owner Login Successful");
+        navigate("/owner-dashboard");
+      } else {
+        toast.error(result.message || "Login failed");
+      }
+    } catch (error) {
+      toast.error(error.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ===== ADMIN LOGIN =====
+  const handleAdminLogin = async () => {
+    if (!adminEmail || !adminPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await frontLogin(adminEmail, adminPassword, "ADMIN");
+      if (result.success) {
+        toast.success("Admin Login Successful");
+        navigate("/admin-dashboard");
+      } else {
+        toast.error(result.message || "Login failed");
+      }
+    } catch (error) {
+      toast.error(error.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="home-page">
       <nav className="navbar navbar-dark home-navbar sticky-top">
         <div className="container-fluid">
-          <a className="navbar-brand d-flex align-items-center" href="#">
+          <a className="navbar-brand d-flex align-items-center" href="/">
             <span className="brand-icon">🏠</span>
             <span className="brand-text">
               PG <span className="brand-highlight">Finder</span>
             </span>
           </a>
           <div className="d-none d-md-flex gap-4 align-items-center">
-            <a href="#" className="nav-link-custom">
-              About
+            <a href="/about-us" className="nav-link-custom">
+              About Us
             </a>
-            <a href="#" className="nav-link-custom">
-              Contact
+            <a href="/contact-us" className="nav-link-custom">
+              Contact Us
             </a>
-            <a href="#" className="nav-link-custom">
+            <a href="/help" className="nav-link-custom">
               Help
             </a>
-            <button className="btn btn-sm nav-cta-btn">Login / Sign Up</button>
+            <button
+              className="btn btn-sm nav-cta-btn"
+              onClick={handleLoginClick}
+            >
+              Login / Sign Up
+            </button>
           </div>
         </div>
       </nav>
 
-
       <div className="container home-container">
-
         <div className="text-center text-white mb-4">
           <div className="hero-pill">
             <span className="hero-pill-dot"></span>
@@ -64,9 +142,9 @@ export default function Home() {
           </div>
         </div>
 
- 
+        {/* ===== LOGIN CARDS ===== */}
         <div className="row g-4 cards-row">
-
+          {/* CLIENT LOGIN */}
           <div className="col-lg-4 col-md-6">
             <div className="card h-100 pg-card">
               <div className="text-center mb-4">
@@ -91,9 +169,7 @@ export default function Home() {
 
               <div>
                 <div className="mb-3">
-                  <label className="form-label input-label">
-                    Email address
-                  </label>
+                  <label className="form-label input-label">Email address</label>
                   <input
                     type="email"
                     className="form-control pg-input"
@@ -116,34 +192,23 @@ export default function Home() {
                     onChange={(e) => setFindPassword(e.target.value)}
                   />
                   <div className="d-flex justify-content-end">
-                    <button
-                      type="button"
-                      className="btn btn-link forgot-password-btn"
-                    >
+                    <button type="button" className="btn btn-link forgot-password-btn">
                       Forgot password?
                     </button>
                   </div>
                 </div>
 
-                <button 
+                <button
                   className="btn w-100 mb-2 pg-btn-primary"
-                  onClick={()=>{
-                    const res = frontLogin(findEmail,findPassword,"CLIENT");
-                    if(res.success) 
-                    {
-                      toast.success("Client Login Successful");
-                      navigate("/client");
-                    }
-                    else {
-                      toast.error(res.message);
-                    }
-                  }}
+                  onClick={handleClientLogin}
+                  disabled={loading}
                 >
-                  Login & Continue
+                  {loading ? "Logging in..." : "Login & Continue"}
                 </button>
-                <button 
+                <button
                   className="btn w-100 pg-btn-outline"
-                  onClick={()=>navigate("/register-client")}
+                  onClick={() => navigate("/register-client")}
+                  disabled={loading}
                 >
                   Create a new account
                 </button>
@@ -151,6 +216,7 @@ export default function Home() {
             </div>
           </div>
 
+          {/* OWNER LOGIN */}
           <div className="col-lg-4 col-md-6">
             <div className="card h-100 pg-card">
               <div className="text-center mb-4">
@@ -202,32 +268,25 @@ export default function Home() {
                   </small>
                 </div>
 
-                <button 
+                <button
                   className="btn w-100 mb-2 pg-btn-primary"
-                  onClick={()=>{
-                    const res = frontLogin(listEmail,listPassword,"OWNER");
-                    if(res.success)
-                    {
-                      toast.success("Admin Login Successful");
-                      navigate("/owner-dashboard");
-                    }
-                    else{
-                      toast.error(res.message);
-                    } 
-                  }}
-                  >
-                  Login as Owner
+                  onClick={handleOwnerLogin}
+                  disabled={loading}
+                >
+                  {loading ? "Logging in..." : "Login as Owner"}
                 </button>
-                <button 
+                <button
                   className="btn w-100 pg-btn-outline"
-                  onClick={()=>navigate("/register-owner")}
-                  >
+                  onClick={() => navigate("/register-owner")}
+                  disabled={loading}
+                >
                   Register your PG
                 </button>
               </div>
             </div>
           </div>
 
+          {/* ADMIN LOGIN */}
           <div className="col-lg-4 col-md-12">
             <div className="card h-100 pg-card">
               <div className="text-center mb-4">
@@ -256,7 +315,7 @@ export default function Home() {
                   <input
                     type="email"
                     className="form-control pg-input"
-                    placeholder="admin@pgfinder.com"
+                    placeholder="admin@residentia.com"
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
                   />
@@ -273,21 +332,12 @@ export default function Home() {
                   />
                 </div>
 
-                <button 
+                <button
                   className="btn w-100 pg-btn-primary"
-                  onClick={()=>{
-                    const res = frontLogin(adminEmail,adminPassword,"ADMIN");
-                    if(res.success)
-                    {
-                      toast.success("Owner Login Successful");
-                      navigate("/admin-dashboard");
-                    }
-                    else{
-                      toast.error(res.message);
-                    } 
-                  }}
-                  >
-                  Admin Login
+                  onClick={handleAdminLogin}
+                  disabled={loading}
+                >
+                  {loading ? "Logging in..." : "Admin Login"}
                 </button>
                 <p className="admin-note">
                   For security reasons, admin access is restricted. Contact the
