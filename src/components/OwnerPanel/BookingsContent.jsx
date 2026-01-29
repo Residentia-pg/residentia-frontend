@@ -1,39 +1,38 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Owner.module.css";
+import API from "../../api/api";
 import { useNavigate } from "react-router-dom";
 
 const BookingsContent = () => {
-  const bookings = [
-    {
-      id: 1,
-      property: "Green Valley PG",
-      tenant: "Anand Kulkarni",
-      phone: "+91 9876543210",
-      amount: "₹12,000",
-      date: "Mar 15, 2024",
-      status: "Confirmed",
-    },
-    {
-      id: 2,
-      property: "Comfort Stay",
-      tenant: "Abhijeet Darade",
-      phone: "+91 9876543211",
-      amount: "₹15,000",
-      date: "Mar 20, 2024",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      property: "Student Hub PG",
-      tenant: "POJO",
-      phone: "+91 9876543212",
-      amount: "₹8,500",
-      date: "Mar 25, 2024",
-      status: "Confirmed",
-    },
-  ];
-  
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadBookings();
+  }, []);
+
+  const loadBookings = async () => {
+    try {
+      const res = await API.get("/api/owner/bookings");
+      setBookings(res.data);
+    } catch (err) {
+      alert("Failed to load bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmBooking = async (id) => {
+    try {
+      await API.put(`/api/owner/bookings/${id}/confirm`);
+      loadBookings(); // refresh list
+    } catch (err) {
+      alert("Confirm failed");
+    }
+  };
+
+  if (loading) return <p className="text-center">Loading bookings...</p>;
 
   return (
     <div>
@@ -45,6 +44,7 @@ const BookingsContent = () => {
             <tr>
               <th>Property</th>
               <th>Tenant</th>
+              <th>Phone</th>
               <th>Amount</th>
               <th>Status</th>
               <th>Actions</th>
@@ -56,6 +56,7 @@ const BookingsContent = () => {
               <tr key={b.id}>
                 <td>{b.property?.name}</td>
                 <td>{b.tenantName}</td>
+                <td>{b.tenantPhone}</td>
                 <td>₹{b.amount}</td>
                 <td>
                   <span
@@ -68,24 +69,19 @@ const BookingsContent = () => {
                     {b.status}
                   </span>
                 </td>
-                <td>
+                <td className="d-flex gap-2">
+                  <button
+                    className="btn btn-sm btn-outline-light"
+                    onClick={() => navigate(`/owner/client/${b.id}`)}
+                  >
+                    View
+                  </button>
+
                   {b.status === "PENDING" && (
                     <button
-                      className="btn btn-success btn-sm"
+                      className="btn btn-sm btn-success"
                       onClick={() => confirmBooking(b.id)}
                     >
-                      {booking.status}
-                    </span>
-                  </td>
-                  <td className={styles.td}>
-                    <button className="btn btn-sm btn-outline-light me-2"
-                    onClick={() =>
-                        navigate(`/owner/client/${booking.id}`)
-                    }
-                    >
-                      View
-                    </button>
-                    <button className="btn btn-sm btn-outline-success">
                       Confirm
                     </button>
                   )}

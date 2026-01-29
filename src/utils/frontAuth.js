@@ -1,45 +1,64 @@
-const Temp_Users={
-        CLIENT:{email:"client@test.com",password:"1234",},
-        OWNER:{email:"owner@test.com",password:"1234",},
-        ADMIN:{email:"admin@test.com",password:"admin",},
+import API from "../api/api";
+
+
+/**
+ * Login function supporting API integration + temp credentials fallback
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @param {string} role - OWNER | ADMIN | CLIENT
+ */
+export async function frontLogin(email, password, role) {
+  if (!email || !password) {
+    return { success: false, message: "Email & password required" };
+  }
+
+  try {
+    // Try API login first
+    const res = await API.post("/api/auth/login", {
+      email,
+      password,
+      role,
+    });
+
+    if (res.data.token) {
+      const authData = {
+        email: res.data.email,
+        role,
+        isLoggedIn: true,
+        token: res.data.token,
+        user: {
+          id: res.data.userId || res.data.ownerId || res.data.adminId,
+          name: res.data.name,
+          email: res.data.email
+        },
+      };
+      localStorage.setItem("pg_auth", JSON.stringify(authData));
+      return { success: true, role, data: res.data };
+    }
+    return { success: false, message: res.data.message || "Login failed" };
+  } catch (error) {
+    console.error("Login error:", error);
+    return {
+      success: false,
+      message: error.response?.data?.message || "An error occurred during login"
     };
-
-export function frontLogin(email,password,role)
-{
-    console.log("LOGIN ATTEMPT:", email, password, role);
-    if(!email || !password)
-    {
-        return {success:false,message:"Email & password required"};
-    }
-    
-    const tempUser = Temp_Users[role];
-    
-    if(!tempUser)
-    {
-        return {success:false,message:"Invalid role!!"};
-    }
-    if(email!==tempUser.email || password!== tempUser.password)
-    {
-        return{success: false, message: "Invalid credentials"};
-    }
-
-    const authData={
-        email,role,isLoggedIn:true,
-    };
-
-    localStorage.setItem("pg_auth",JSON.stringify(authData));
-
-    return {success:true,role};
+  }
 }
 
-export function getAuthUser()
-{
-    const data = localStorage.getItem("pg_auth");
-    return data ?JSON.parse(data) :null;
+/**
+ * Get authenticated user from localStorage
+ */
+export function getAuthUser() {
+  const data = localStorage.getItem("pg_auth");
+  return data ? JSON.parse(data) : null;
 }
 
-export function logout()
-{
-    localStorage.removeItem("pg_auth");
+/**
+ * Clear auth data and logout user
+ */
+export function logout() {
+  localStorage.removeItem("pg_auth");
+  localStorage.removeItem("ownerEmail");
+  localStorage.removeItem("ownerToken");
+  localStorage.removeItem("ownerId");
 }
-// temp login--replace backapi

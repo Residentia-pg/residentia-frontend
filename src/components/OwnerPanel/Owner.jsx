@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Owner.module.css";
 
+
+
 import DashboardContent from "./DashboardContent";
 import MyPropertiesContent from "./MyPropertiesContent";
 import AddPropertyContent from "./AddPropertyContent";
 import BookingsContent from "./BookingsContent";
 import ProfileContent from "./ProfileContent";
+import API from "../../api/api";
 
-import API from "../../api";
+//import API from "../../api";
 import { logout } from "../../utils/frontAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -79,9 +82,8 @@ const Owner = () => {
               <div
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`${styles.tabItem} ${
-                  isActive ? styles.tabActive : ""
-                }`}
+                className={`${styles.tabItem} ${isActive ? styles.tabActive : ""
+                  }`}
               >
                 {tab}
               </div>
