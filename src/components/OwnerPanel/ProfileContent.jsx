@@ -25,12 +25,12 @@ const ProfileContent = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      const res = await API.get("/api/owner/profile");
+      const res = await API.get("/api/owners/profile");
       setOwner(res.data);
     } catch (err) {
       toast.error(
         "Failed to load profile: " +
-          (err.response?.data?.message || err.message)
+        (err.response?.data?.message || err.message)
       );
     } finally {
       setLoading(false);
@@ -39,12 +39,12 @@ const ProfileContent = () => {
 
   const updateProfile = async () => {
     try {
-      await API.put("/api/owner/profile", owner);
+      await API.put("/api/owners/profile", owner);
       toast.success("Profile updated successfully!");
     } catch (err) {
       toast.error(
         "Update failed: " +
-          (err.response?.data?.message || err.message)
+        (err.response?.data?.message || err.message)
       );
     }
   };

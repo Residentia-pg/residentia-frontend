@@ -18,9 +18,27 @@ const MyPropertiesContent = () => {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const response = await API.get("/api/owner/pgs");
-      console.log("Properties fetched:", response.data);
-      setPgs(Array.isArray(response.data) ? response.data : []);
+      // Get owner email from local storage
+      const ownerData = localStorage.getItem("pg_auth");
+      let ownerEmail = null;
+      if (ownerData) {
+        try {
+          const parsed = JSON.parse(ownerData);
+          ownerEmail = parsed.user?.email;
+        } catch (e) {
+          console.error("Error parsing auth data:", e);
+        }
+      }
+
+      // Use owner-specific endpoint to get ALL their properties (regardless of status)
+      if (ownerEmail) {
+        const response = await API.get(`/api/pgs/owner/${encodeURIComponent(ownerEmail)}`);
+        console.log("Properties fetched for owner:", response.data);
+        setPgs(Array.isArray(response.data) ? response.data : []);
+      } else {
+        console.error("Owner email not found");
+        toast.error("Please login again to view your properties");
+      }
     } catch (error) {
       console.error("Failed to load properties:", error);
       toast.error("Failed to load properties: " + (error.response?.data?.message || error.message));
@@ -39,11 +57,11 @@ const MyPropertiesContent = () => {
       // Soft delete: update status to INACTIVE using PUT
       const propertyToUpdate = pgs.find(pg => (pg.propertyId || pg.id) === propertyId);
       const updatedProperty = { ...propertyToUpdate, status: "INACTIVE" };
-      await API.put(`/api/owner/pgs/${propertyId}`, updatedProperty);
+      await API.put(`/api/pgs/${propertyId}`, updatedProperty);
       toast.success("Property deactivated successfully!");
       // Update the property status in state
-      setPgs(pgs.map(pg => 
-        (pg.propertyId || pg.id) === propertyId 
+      setPgs(pgs.map(pg =>
+        (pg.propertyId || pg.id) === propertyId
           ? { ...pg, status: "INACTIVE" }
           : pg
       ));
@@ -65,11 +83,11 @@ const MyPropertiesContent = () => {
       // Reactivate using PUT
       const propertyToUpdate = pgs.find(pg => (pg.propertyId || pg.id) === propertyId);
       const updatedProperty = { ...propertyToUpdate, status: "ACTIVE" };
-      await API.put(`/api/owner/pgs/${propertyId}`, updatedProperty);
+      await API.put(`/api/pgs/${propertyId}`, updatedProperty);
       toast.success("Property reactivated successfully!");
       // Update the property status in state
-      setPgs(pgs.map(pg => 
-        (pg.propertyId || pg.id) === propertyId 
+      setPgs(pgs.map(pg =>
+        (pg.propertyId || pg.id) === propertyId
           ? { ...pg, status: "ACTIVE" }
           : pg
       ));
@@ -90,8 +108,8 @@ const MyPropertiesContent = () => {
   };
 
   // Filter properties based on showInactive toggle
-  const displayedProperties = showInactive 
-    ? pgs 
+  const displayedProperties = showInactive
+    ? pgs
     : pgs.filter(pg => pg.status === "ACTIVE");
 
   if (loading) {
@@ -152,8 +170,8 @@ const MyPropertiesContent = () => {
           border: "2px dashed #D1D5DB"
         }}>
           <p style={{ color: "#6B7280", fontSize: "16px" }}>
-            {showInactive && pgs.length > 0 
-              ? "No inactive properties to show" 
+            {showInactive && pgs.length > 0
+              ? "No inactive properties to show"
               : "No active properties found. Create your first property to get started!"}
           </p>
         </div>
@@ -275,7 +293,7 @@ const MyPropertiesContent = () => {
                       marginTop: "8px",
                       marginBottom: "0"
                     }}>
-                       {pg.amenities}
+                      {pg.amenities}
                     </p>
                   )}
                 </div>
@@ -313,7 +331,7 @@ const MyPropertiesContent = () => {
                       }
                     }}
                   >
-                     View
+                    View
                   </button>
                   {pg.status === "ACTIVE" ? (
                     <button

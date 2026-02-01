@@ -1,21 +1,25 @@
 import React from "react";
 import PGCard from "./PGCard";
 
-const Listings = ({ pgListings, filter }) => {
+const Listings = ({ pgListings, filter, onViewDetails, onBookNow, wishlist, onToggleWishlist }) => {
   const { selectedCity, selectedBudget, selectedType, foodIncluded } = filter;
 
   const filtered = pgListings.filter((pg) => {
-    if (selectedCity && !pg.location.toLowerCase().includes(selectedCity))
+    // Filter out "junk" data (incomplete database records)
+    // Filter out rows with no name (incomplete)
+    // if (!pg.propertyName) return false; // excessively strict for debugging
+
+    if (selectedCity && (!pg.location || !pg.location.toLowerCase().includes(selectedCity)))
       return false;
 
     if (selectedType) {
-      if (!pg.sharing.includes(`${selectedType}-sharing`)) return false;
+      if (!pg.sharingType || !pg.sharingType.includes(`${selectedType}-sharing`)) return false;
     }
 
-    if (foodIncluded && !pg.amenities.includes("Food")) return false;
+    if (foodIncluded && (!pg.amenities || !pg.amenities.includes("Food"))) return false;
 
     if (selectedBudget) {
-      const amt = pg.price;
+      const amt = pg.rentAmount;
       if (selectedBudget === "5000-10000" && !(amt >= 5000 && amt <= 10000))
         return false;
       if (selectedBudget === "10000-15000" && !(amt > 10000 && amt <= 15000))
@@ -30,16 +34,28 @@ const Listings = ({ pgListings, filter }) => {
 
   return (
     <div className="row g-4">
-      {filtered.length === 0 ? (
-        <div className="col-12">
-          <div style={{ color: "#a0aec0" }}>
-            No PGs found matching your filters.
+      {pgListings.length === 0 ? (
+        <div className="col-12 text-center py-5">
+          <div style={{ color: "#6b7280", fontSize: "18px" }}>
+            Owner has not registered any PGs.
+          </div>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="col-12 text-center py-5">
+          <div style={{ color: "#6b7280", fontSize: "16px" }}>
+            No PGs found matching your search criteria.
           </div>
         </div>
       ) : (
         filtered.map((pg) => (
           <div key={pg.id} className="col-md-4">
-            <PGCard pg={pg} />
+            <PGCard
+              pg={pg}
+              onViewDetails={onViewDetails}
+              onBookNow={onBookNow}
+              isWishlisted={wishlist.includes(pg.id)}
+              onToggleWishlist={onToggleWishlist}
+            />
           </div>
         ))
       )}

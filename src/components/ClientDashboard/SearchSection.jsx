@@ -27,6 +27,7 @@ const SearchSection = ({
               borderColor: "#d1d5db",
               color: "#374151",
               fontSize: 14,
+              padding: "10px 12px",
             }}
           >
             <option value="">Select City</option>
@@ -49,6 +50,7 @@ const SearchSection = ({
               borderColor: "#d1d5db",
               color: "#374151",
               fontSize: 14,
+              padding: "10px 12px",
             }}
           >
             <option value="">Select Budget</option>
@@ -70,6 +72,7 @@ const SearchSection = ({
               borderColor: "#d1d5db",
               color: "#374151",
               fontSize: 14,
+              padding: "10px 12px",
             }}
           >
             <option value="">Select Type</option>
@@ -81,7 +84,7 @@ const SearchSection = ({
         </div>
 
         <div className="col-md-2">
-          <div className="form-check" style={{ paddingTop: "12px" }}>
+          <div className="form-check d-flex align-items-center" style={{ height: "46px", marginBottom: 0 }}>
             <input
               className="form-check-input"
               type="checkbox"
@@ -103,6 +106,7 @@ const SearchSection = ({
                 color: "#374151",
                 fontSize: 14,
                 cursor: "pointer",
+                whiteSpace: "nowrap"
               }}
             >
               Food Included
@@ -118,15 +122,9 @@ const SearchSection = ({
               color: "#ffffff",
               fontWeight: 600,
               fontSize: 14,
-              padding: "10px 16px",
+              padding: "12px 16px",
               border: "none",
               transition: "background-color 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#2563eb";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#3b82f6";
             }}
           >
             Search PGs

@@ -5,7 +5,7 @@ import API from "./api";
 
 export const getBookings = async () => {
   try {
-    const response = await API.get("/api/owner/bookings");
+    const response = await API.get("/api/owners/bookings");
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
@@ -14,7 +14,7 @@ export const getBookings = async () => {
 
 export const createBooking = async (bookingData) => {
   try {
-    const response = await API.post("/api/owner/bookings", bookingData);
+    const response = await API.post("/api/owners/bookings", bookingData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

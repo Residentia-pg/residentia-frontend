@@ -32,7 +32,7 @@ const Owner = () => {
 
   // 🔥 Load real owner from backend
   useEffect(() => {
-    API.get("/api/owner/profile")
+    API.get("/api/owners/profile")
       .then((res) => {
         setOwner(res.data);
       })

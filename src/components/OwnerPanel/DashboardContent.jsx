@@ -12,13 +12,24 @@ const DashboardContent = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const propertiesRes = await API.get("/api/owner/pgs");
-        const bookingsRes = await API.get("/api/owner/bookings");
+        // Get logged in user
+        const authData = JSON.parse(localStorage.getItem("pg_auth"));
+        const ownerEmail = authData?.user?.email || authData?.email;
 
-        const properties = propertiesRes.data;
-        const bookings = bookingsRes.data;
+        if (!ownerEmail) {
+          console.warn("Owner email not found in auth data");
+          return;
+        }
+
+        const propertiesRes = await API.get(`/api/pgs/owner/${encodeURIComponent(ownerEmail)}`);
+        // Already filtered by owner email
+        const properties = propertiesRes.data || [];
+
+        const bookingsRes = await API.get(`/api/owners/bookings?email=${encodeURIComponent(ownerEmail)}`);
+
+        const bookings = bookingsRes.data || [];
         const confirmed = bookings.filter(b => b.status === "CONFIRMED");
-        const revenue = confirmed.reduce((sum, b) => sum + b.amount, 0);
+        const revenue = confirmed.reduce((sum, b) => sum + (b.pgId?.rentAmount || 0), 0);
 
         setStats([
           { label: "Properties", value: properties.length, color: "#38bdf8" },
@@ -167,14 +178,14 @@ const DashboardContent = () => {
             <tbody>
               {recentBookings.map((booking, idx) => (
                 <tr key={idx} className={styles.tr}>
-                  <td className={styles.td}>{booking.property?.name}</td>
-                  <td className={styles.td}>{booking.tenantName}</td>
-                  <td className={styles.td}>{booking.amount}</td>
+                  <td className={styles.td}>{booking.pgId?.propertyName || "N/A"}</td>
+                  <td className={styles.td}>{booking.user?.name || "N/A"}</td>
+                  <td className={styles.td}>{booking.pgId?.rentAmount || "-"}</td>
                   <td className={styles.td}>
                     <span
                       className={`${styles.statusBadge} ${booking.status === "CONFIRMED"
-                          ? styles.confirmed
-                          : styles.pending
+                        ? styles.confirmed
+                        : styles.pending
                         }`}
                     >
                       {booking.status}

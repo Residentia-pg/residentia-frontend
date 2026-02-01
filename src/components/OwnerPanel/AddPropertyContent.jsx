@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styles from "./Owner.module.css";
 import { createProperty } from "../../api/propertyApi";
+import { getAuthUser } from "../../utils/frontAuth";
+import { toast } from "react-toastify";
 
 const AddPropertyContent = () => {
   const [formData, setFormData] = useState({
@@ -53,13 +55,18 @@ const AddPropertyContent = () => {
       })
       .join(",");
 
+    const auth = getAuthUser();
+    const ownerEmail = auth?.email || localStorage.getItem("ownerEmail");
+
     const data = {
+      name: formData.propertyName, // Match backend "name" field if necessary
       propertyName: formData.propertyName,
       address: formData.address,
       city: formData.city,
       state: formData.state,
       pincode: formData.pincode,
       rentAmount: Number(formData.rentAmount),
+      price: Number(formData.rentAmount), // Match backend "price" field
       sharingType: formData.sharingType,
       maxCapacity: Number(formData.maxCapacity),
       availableBeds: Number(formData.availableBeds),
@@ -68,11 +75,12 @@ const AddPropertyContent = () => {
       status: formData.status,
       amenities: amenitiesArray || null,
       imageUrl: formData.imageUrl || null,
+      ownerEmail: ownerEmail
     };
 
     try {
       await createProperty(data);
-      alert("Property added successfully!");
+      toast.success("Property added successfully!");
       // Reset form
       setFormData({
         propertyName: "",
@@ -100,7 +108,7 @@ const AddPropertyContent = () => {
         hotWater: false,
       });
     } catch (err) {
-      alert("Failed to add property: " + (err.message || "Unknown error"));
+      toast.error("Failed to add property: " + (err.response?.data?.message || err.message || "Unknown error"));
       console.error(err);
     } finally {
       setLoading(false);

@@ -14,12 +14,12 @@ const ViewProperty = () => {
 
   useEffect(() => {
     fetchProperty();
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchProperty = async () => {
     try {
       setLoading(true);
-      const response = await API.get(`/api/owner/pgs/${id}`);
+      const response = await API.get(`/api/pgs/${id}`);
       console.log("Property details:", response.data);
       setProperty(response.data);
       setEditData(response.data);
@@ -60,26 +60,26 @@ const ViewProperty = () => {
 
     try {
       setIsSaving(true);
-      
+
       // Validate property data exists
       if (!property || !property.propertyId) {
         toast.error("Property data is missing. Please reload and try again.");
         return;
       }
-      
+
       if (!property.ownerId) {
         toast.error("Owner information is missing. Please reload and try again.");
         return;
       }
-      
+
       // Calculate what fields have changed
       const changes = {};
       const fieldsToCheck = [
-        'propertyName', 'address', 'city', 'state', 'pincode', 
-        'rentAmount', 'sharingType', 'maxCapacity', 'availableBeds', 
+        'propertyName', 'address', 'city', 'state', 'pincode',
+        'rentAmount', 'sharingType', 'maxCapacity', 'availableBeds',
         'foodIncluded', 'description', 'mapLink', 'imageUrl', 'amenities'
       ];
-      
+
       let hasChanges = false;
       fieldsToCheck.forEach(field => {
         if (property[field] !== editData[field]) {
@@ -87,13 +87,13 @@ const ViewProperty = () => {
           hasChanges = true;
         }
       });
-      
+
       if (!hasChanges) {
         toast.info("No changes detected");
         setIsEditing(false);
         return;
       }
-      
+
       // Create a change request instead of directly updating
       const changeRequest = {
         property: { id: parseInt(property.propertyId) },
@@ -102,14 +102,14 @@ const ViewProperty = () => {
         changeDetails: JSON.stringify(changes),
         status: "PENDING"
       };
-      
+
       console.log("Submitting change request:", changeRequest);
-      
-      const response = await API.post("/api/owner/change-request", changeRequest);
-      
+
+      await API.post("/api/owners/change-request", changeRequest);
+
       setIsEditing(false);
       toast.success("✅ Change request submitted successfully! Status: PENDING. Waiting for admin approval.");
-      
+
       // Optionally reload property data
       await fetchProperty();
     } catch (error) {
@@ -123,7 +123,7 @@ const ViewProperty = () => {
 
   const handleCancel = () => {
     // Reset editData to the current property to discard changes
-    setEditData({...property});
+    setEditData({ ...property });
     setIsEditing(false);
   };
 
@@ -398,7 +398,7 @@ const ViewProperty = () => {
                   {property?.propertyName}
                 </h1>
               )}
-              
+
               {isEditing ? (
                 <div style={{
                   display: "grid",

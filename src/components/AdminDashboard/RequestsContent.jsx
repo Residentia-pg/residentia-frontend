@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 const RequestsContent = () => {
   const [requests, setRequests] = useState([]);
   const [loadingRequestId, setLoadingRequestId] = useState(null);
-  
+
   useEffect(() => {
     loadRequests();
   }, []);
@@ -26,12 +26,12 @@ const RequestsContent = () => {
     try {
       setLoadingRequestId(id);
       const res = await API.put(`/api/admin/change-requests/${id}/approve`);
-      
+
       // Update the request in UI
       setRequests(prev =>
         prev.map(r => (r.id === id ? res.data : r))
       );
-      
+
       toast.success("Change request approved! Property updated successfully.");
     } catch (error) {
       console.error("Error approving request:", error);
@@ -45,12 +45,12 @@ const RequestsContent = () => {
     try {
       setLoadingRequestId(id);
       const res = await API.put(`/api/admin/change-requests/${id}/reject`);
-      
+
       // Update the request in UI
       setRequests(prev =>
         prev.map(r => (r.id === id ? res.data : r))
       );
-      
+
       toast.info("Change request rejected.");
     } catch (error) {
       console.error("Error rejecting request:", error);
@@ -77,7 +77,7 @@ const RequestsContent = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className={styles.sectionTitle}>Change Requests</h2>
-        <button 
+        <button
           className="btn btn-sm btn-outline-primary"
           onClick={loadRequests}
         >
@@ -91,7 +91,7 @@ const RequestsContent = () => {
         ) : (
           requests.map(req => (
             <div key={req.id} className={styles.activityItem}>
-              <h5>{req.property?.propertyName || "PG"}</h5>
+              <h5>{req.pg?.propertyName || "PG"}</h5>
 
               <p className="text-muted">
                 Requested by: {req.owner?.name}
@@ -108,8 +108,8 @@ const RequestsContent = () => {
                     req.status === "APPROVED"
                       ? styles.badgeGreen
                       : req.status === "REJECTED"
-                      ? styles.badgeRed
-                      : styles.badgeOrange
+                        ? styles.badgeRed
+                        : styles.badgeOrange
                   }
                 >
                   {req.status}

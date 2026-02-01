@@ -32,8 +32,8 @@ const ReviewsContent = () => {
     try {
       await API.delete(`/api/admin/reviews/${id}`);
       setReviews(prev => prev.filter(r => r.id !== id));
-    } catch (err) {
-      alert("Failed to delete review");
+    } catch {
+      console.error("Failed to delete review");
     }
   };
 

@@ -116,6 +116,7 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./AdminDashboard.module.css";
+import { toast } from "react-toastify";
 import API from "../../api/api";
 
 const BookingsContent = () => {
@@ -145,8 +146,8 @@ const BookingsContent = () => {
       setBookings(prev =>
         prev.map(b => (b.id === id ? res.data : b))
       );
-    } catch (err) {
-      alert("Cancel failed");
+    } catch {
+      toast.error("Restore failed");
     }
   };
 
@@ -156,8 +157,8 @@ const BookingsContent = () => {
       setBookings(prev =>
         prev.map(b => (b.id === id ? res.data : b))
       );
-    } catch (err) {
-      alert("Restore failed");
+    } catch {
+      toast.error("Failed to update status");
     }
   };
 
@@ -182,7 +183,7 @@ const BookingsContent = () => {
               <th className={styles.tableHead}>Property</th>
               <th className={styles.tableHead}>Status</th>
               <th className={styles.tableHead}>Actions</th>
-          </tr>
+            </tr>
           </thead>
 
           <tbody>

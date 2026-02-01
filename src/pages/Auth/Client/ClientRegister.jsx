@@ -1,31 +1,32 @@
-import React,{useState} from"react";
-import{toast} from "react-toastify";
-import {useNavigate} from "react-router-dom";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import API from "../../../api/api";
 import "./ClientRegister.css";
 
-const ClientRegister=()=>{
-    const[form,setForm]  =useState({
-        name:"",
-        email:"",
-        mobile:"",
-        dob:"",
-        gender:"",
-        occupation:"",
-        address:"",
-        password:"",
-        confirmPassword:"",
+const ClientRegister = () => {
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        mobile: "",
+        dob: "",
+        gender: "",
+        occupation: "",
+        address: "",
+        password: "",
+        confirmPassword: "",
     });
 
     const navigate = useNavigate();
 
-    const handleChange = (e) =>{
-        setForm({...form,[e.target.name]:e.target.value});
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleRegister = () =>{
-        const{name,email,mobile,dob,gender,occupation,address,password,confirmPassword} = form;
+    const handleRegister = async () => {
+        const { name, email, mobile, dob, gender, occupation, address, password, confirmPassword } = form;
 
-        if(!name || !email || !mobile || !dob ||!gender ||!occupation ||!address || !password ||!confirmPassword){
+        if (!name || !email || !mobile || !dob || !gender || !occupation || !address || !password || !confirmPassword) {
             toast.error("All fields are required");
             return;
         }
@@ -40,24 +41,44 @@ const ClientRegister=()=>{
             return;
         }
 
-        if(password != confirmPassword)
-        {
+        if (password != confirmPassword) {
             toast.error("password mismatch");
             return;
         }
 
-        toast.success("Client registered Successfully!!!");
-        navigate("/");
+        try {
+            // Map form data to backend entity expected format
+            const payload = {
+                name: form.name,
+                email: form.email,
+                mobileNumber: form.mobile,
+                passwordHash: form.password, // Backend will likely hash this or store as is for now
+                // sending other fields even if backend doesn't have them yet, 
+                // but strictly required ones must match
+                // dob: form.dob, 
+                // gender: form.gender, 
+                // occupation: form.occupation, 
+                // address: form.address 
+            };
+            const res = await API.post("/api/clients/register", payload);
+            if (res.data) {
+                toast.success("Client registered Successfully!!!");
+                navigate("/");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Registration failed: " + (error.response?.data?.message || error.message));
+        }
     };
 
-    return(
+    return (
         <div className="register-page">
             <div className="register-card">
                 <button className="btn btn-link p-0 mb-3"
                     style={{ textDecoration: "none", fontWeight: 500 }}
                     onClick={() => navigate("/")}
                 >
-                ← Back
+                    ← Back
                 </button>
                 <h3 className="text-center mb-4">🏠Register, Join Residentia family!!</h3>
 
@@ -134,8 +155,8 @@ const ClientRegister=()=>{
                 <button className="btn btn-primary w-100" onClick={handleRegister}>
                     Register as Client
                 </button>
+            </div>
         </div>
-    </div>
     );
 };
 

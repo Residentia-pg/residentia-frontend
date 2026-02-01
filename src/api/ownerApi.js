@@ -3,7 +3,7 @@ import API from "./api";
 // Owner Authentication
 export const registerOwner = async (ownerData) => {
   try {
-    const response = await API.post("/api/owner/register", ownerData);
+    const response = await API.post("/api/owners/register", ownerData);
     if (response.data.token) {
       localStorage.setItem("ownerEmail", response.data.email);
       localStorage.setItem("ownerToken", response.data.token);
@@ -17,7 +17,7 @@ export const registerOwner = async (ownerData) => {
 
 export const loginOwner = async (email, passwordHash) => {
   try {
-    const response = await API.post("/api/owner/login", {
+    const response = await API.post("/api/owners/login", {
       email,
       passwordHash,
     });
@@ -46,7 +46,7 @@ export const loginOwner = async (email, passwordHash) => {
 
 export const getOwnerProfile = async () => {
   try {
-    const response = await API.get("/api/owner/profile");
+    const response = await API.get("/api/owners/profile");
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
@@ -55,7 +55,7 @@ export const getOwnerProfile = async () => {
 
 export const updateOwnerProfile = async (profileData) => {
   try {
-    const response = await API.put("/api/owner/profile", profileData);
+    const response = await API.put("/api/owners/profile", profileData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

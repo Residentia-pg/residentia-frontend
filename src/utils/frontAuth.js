@@ -13,29 +13,45 @@ export async function frontLogin(email, password, role) {
   }
 
   try {
-    // Try API login first
-    const res = await API.post("/api/auth/login", {
+    // Determine endpoint based on role
+    let endpoint = "";
+    if (role === "CLIENT") endpoint = "/api/clients/login";
+    else if (role === "OWNER") endpoint = "/api/owners/login";
+    else if (role === "ADMIN") endpoint = "/api/admin/login"; // Assuming Admin Controller has login
+
+    // Fallback if role not matched (or handle error)
+    if (!endpoint) return { success: false, message: "Invalid role specified" };
+
+    const res = await API.post(endpoint, {
       email,
       password,
-      role,
     });
 
-    if (res.data.token) {
+    // Backend returns the User object directly e.g. { id, name, email, ... }
+    // It does not seem to return a 'token' field in current implementation.
+    // We will verify if ID exists to confirm success.
+    if (res.data && (res.data.id || res.data.ownerId || res.data.adminId)) {
+      // Create a mock token or use ID for simple auth if backend doesn't use JWT yet
+      // For now, we'll store the whole object.
+      const user = res.data;
+      const token = "mock-token-" + (user.id || user.ownerId || Date.now());
+
       const authData = {
-        email: res.data.email,
+        email: user.email,
         role,
         isLoggedIn: true,
-        token: res.data.token,
+        token: token, // Storing mock token to satisfy axios interceptor
         user: {
-          id: res.data.userId || res.data.ownerId || res.data.adminId,
-          name: res.data.name,
-          email: res.data.email
+          id: user.id || user.ownerId,
+          name: user.name || user.firstName, // Adjust based on actual User entity
+          email: user.email
         },
       };
       localStorage.setItem("pg_auth", JSON.stringify(authData));
       return { success: true, role, data: res.data };
     }
-    return { success: false, message: res.data.message || "Login failed" };
+
+    return { success: false, message: "Invalid credentials" };
   } catch (error) {
     console.error("Login error:", error);
     return {

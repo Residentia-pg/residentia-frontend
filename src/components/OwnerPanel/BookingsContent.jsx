@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import styles from "./Owner.module.css";
-import API from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import API from "../../api/api";
+import { toast } from "react-toastify";
+import styles from "./Owner.module.css";
+import { getAuthUser } from "../../utils/frontAuth";
 
 const BookingsContent = () => {
   const [bookings, setBookings] = useState([]);
@@ -13,22 +15,28 @@ const BookingsContent = () => {
   }, []);
 
   const loadBookings = async () => {
+    const auth = getAuthUser();
+    if (!auth || !auth.user || !auth.user.email) {
+      toast.error("Owner session not found");
+      return;
+    }
     try {
-      const res = await API.get("/api/owner/bookings");
+      const res = await API.get(`/api/owners/bookings?email=${auth.user.email}`);
       setBookings(res.data);
-    } catch (err) {
-      alert("Failed to load bookings");
+    } catch {
+      toast.error("Failed to fetch bookings");
     } finally {
       setLoading(false);
     }
   };
 
-  const confirmBooking = async (id) => {
+  const updateStatus = async (id, action) => {
     try {
-      await API.put(`/api/owner/bookings/${id}/confirm`);
+      await API.put(`/api/owners/bookings/${id}/${action}`);
+      toast.success(`Booking ${action}ed successfully`);
       loadBookings(); // refresh list
-    } catch (err) {
-      alert("Confirm failed");
+    } catch {
+      toast.error(`${action.charAt(0).toUpperCase() + action.slice(1)} failed`);
     }
   };
 
@@ -36,54 +44,67 @@ const BookingsContent = () => {
 
   return (
     <div>
-      <h2 className={styles.sectionTitle}>All Bookings</h2>
+      <h2 className={styles.sectionTitle}>Booking Requests</h2>
+      <p className="text-muted small mb-4">View and manage booking requests for your properties.</p>
 
       <div className={styles.tableCard}>
-        <table className={`table table-dark ${styles.noMargin}`}>
+        <table className={`table ${styles.noMargin}`}>
           <thead>
             <tr>
-              <th>Property</th>
-              <th>Tenant</th>
-              <th>Phone</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th className={styles.tableHead}>Property</th>
+              <th className={styles.tableHead}>Tenant</th>
+              <th className={styles.tableHead}>Phone</th>
+              <th className={styles.tableHead}>Start Date</th>
+              <th className={styles.tableHead}>Status</th>
+              <th className={styles.tableHead}>Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {bookings.map((b) => (
-              <tr key={b.id}>
-                <td>{b.property?.name}</td>
-                <td>{b.tenantName}</td>
-                <td>{b.tenantPhone}</td>
-                <td>₹{b.amount}</td>
-                <td>
+            {bookings.length === 0 ? (
+              <tr><td colSpan="6" className="text-center py-4">No booking requests found.</td></tr>
+            ) : bookings.map((b) => (
+              <tr key={b.id} className={styles.tr}>
+                <td className={styles.td}>{b.pgId?.propertyName || b.pgId?.name || "Deleted PG"}</td>
+                <td className={styles.td}>{b.user?.name || "Unknown"}</td>
+                <td className={styles.td}>{b.user?.mobileNumber || "N/A"}</td>
+                <td className={styles.td}>{b.startDate}</td>
+                <td className={styles.td}>
                   <span
                     className={
-                      b.status === "CONFIRMED"
+                      b.status === "APPROVED" || b.status === "CONFIRMED"
                         ? styles.confirmed
-                        : styles.pending
+                        : b.status === "REJECTED"
+                          ? styles.rejected
+                          : styles.pending
                     }
                   >
                     {b.status}
                   </span>
                 </td>
-                <td className="d-flex gap-2">
+                <td className={`${styles.td} d-flex gap-2`}>
                   <button
-                    className="btn btn-sm btn-outline-light"
+                    className="btn btn-sm btn-outline-dark"
                     onClick={() => navigate(`/owner/client/${b.id}`)}
                   >
                     View
                   </button>
 
                   {b.status === "PENDING" && (
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => confirmBooking(b.id)}
-                    >
-                      Confirm
-                    </button>
+                    <>
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => updateStatus(b.id, "approve")}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => updateStatus(b.id, "reject")}
+                      >
+                        Reject
+                      </button>
+                    </>
                   )}
                 </td>
               </tr>
@@ -91,6 +112,7 @@ const BookingsContent = () => {
           </tbody>
 
         </table>
+        {bookings.length > 0 && <div className="text-muted small p-2 text-end">Total Bookings: {bookings.length}</div>}
       </div>
     </div>
   );

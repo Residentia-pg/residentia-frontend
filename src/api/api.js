@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8888", // Backend running on port 8888
+  baseURL: "http://localhost:8080", // Backend running on port 8080
   headers: { "Content-Type": "application/json" },
 });
 
