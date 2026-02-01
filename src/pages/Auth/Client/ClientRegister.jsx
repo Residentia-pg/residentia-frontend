@@ -1,6 +1,7 @@
 import React,{useState} from"react";
 import{toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
+import { frontRegisterClient } from "../../../utils/frontAuth";
 import "./ClientRegister.css";
 
 const ClientRegister=()=>{
@@ -17,12 +18,13 @@ const ClientRegister=()=>{
     });
 
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) =>{
         setForm({...form,[e.target.name]:e.target.value});
     };
 
-    const handleRegister = () =>{
+    const handleRegister = async () =>{
         const{name,email,mobile,dob,gender,occupation,address,password,confirmPassword} = form;
 
         if(!name || !email || !mobile || !dob ||!gender ||!occupation ||!address || !password ||!confirmPassword){
@@ -46,8 +48,28 @@ const ClientRegister=()=>{
             return;
         }
 
-        toast.success("Client registered Successfully!!!");
-        navigate("/");
+        setLoading(true);
+        try {
+            const res = await frontRegisterClient({
+                email,
+                name,
+                mobileNumber: mobile,
+                password
+            });
+
+            if (res.success) {
+                toast.success("Client registered Successfully!!!");
+                navigate("/");
+            } else {
+                const message = res.message?.message || res.message || "Registration failed";
+                toast.error(message);
+            }
+        } catch (err) {
+            console.error("Register error", err);
+            toast.error("An error occurred during registration");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return(
@@ -131,8 +153,8 @@ const ClientRegister=()=>{
                     className="form-control mb-4"
                     onChange={handleChange}
                 />
-                <button className="btn btn-primary w-100" onClick={handleRegister}>
-                    Register as Client
+                <button className="btn btn-primary w-100" onClick={handleRegister} disabled={loading}>
+                    {loading ? "Registering..." : "Register as Client"}
                 </button>
         </div>
     </div>

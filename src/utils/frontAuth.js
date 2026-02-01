@@ -46,6 +46,46 @@ export async function frontLogin(email, password, role) {
 }
 
 /**
+ * Register client helper
+ * Expects { email, name, mobileNumber, password }
+ */
+export async function frontRegisterClient({ email, name, mobileNumber, password }) {
+  if (!email || !password || !mobileNumber) {
+    return { success: false, message: "email, password and mobileNumber are required" };
+  }
+
+  try {
+    const res = await API.post("/api/auth/register/client", {
+      email,
+      name,
+      mobileNumber,
+      password,
+    });
+
+    if (res.data && res.data.token) {
+      const authData = {
+        email: res.data.email,
+        role: "CLIENT",
+        isLoggedIn: true,
+        token: res.data.token,
+        user: {
+          id: res.data.userId,
+          name: res.data.name,
+          email: res.data.email
+        },
+      };
+      localStorage.setItem("pg_auth", JSON.stringify(authData));
+      return { success: true, data: res.data };
+    }
+
+    return { success: false, message: res.data || "Registration failed" };
+  } catch (error) {
+    console.error("Registration error:", error);
+    return { success: false, message: error.response?.data || error.message };
+  }
+}
+
+/**
  * Get authenticated user from localStorage
  */
 export function getAuthUser() {
