@@ -1,3 +1,5 @@
+import ClientProfile from "./pages/ClientProfile";
+  <Route path="/client/profile" element={<ClientProfile />} />
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 
@@ -16,6 +18,9 @@ import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import Owner from "./components/OwnerPanel/Owner";
 import ClientView from "./components/OwnerPanel/ClientView";
 import ViewProperty from "./components/OwnerPanel/ViewProperty";
+import ClientPropertyView from "./components/ClientDashboard/ClientPropertyView";
+import Payment from "./pages/Payment";
+import ClientBookingPage from "./components/ClientDashboard/ClientBookingPage";
 
 // ===== ROUTES =====
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -51,6 +56,9 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/property/:id" element={<ClientPropertyView />} />
+      <Route path="/book/:id" element={<ClientBookingPage />} />
+      <Route path="/payment" element={<Payment />} />
 
       {/* ===== ADMIN ROUTES (FROM V2) ===== */}
       

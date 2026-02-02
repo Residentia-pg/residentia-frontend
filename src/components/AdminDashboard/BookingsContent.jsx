@@ -194,10 +194,10 @@ const BookingsContent = () => {
               </tr>
             ) : (
               bookings.map(booking => (
-                <tr key={booking.id}>
-                  <td>#{booking.id}</td>
-                  <td>{booking.user?.name || "N/A"}</td>
-                  <td>{booking.pg?.propertyName || "N/A"}</td>
+                <tr key={booking.bookingId || booking.id}>
+                  <td>#{booking.bookingId || booking.id}</td>
+                  <td>{booking.tenantName || "N/A"}</td>
+                  <td>{booking.propertyName || "N/A"}</td>
 
                   <td>
                     <span
@@ -215,7 +215,7 @@ const BookingsContent = () => {
                     {booking.status === "CONFIRMED" && (
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() => cancel(booking.id)}
+                        onClick={() => cancel(booking.bookingId || booking.id)}
                       >
                         Cancel
                       </button>
@@ -224,7 +224,7 @@ const BookingsContent = () => {
                     {booking.status === "CANCELLED" && (
                       <button
                         className="btn btn-success btn-sm"
-                        onClick={() => restore(booking.id)}
+                        onClick={() => restore(booking.bookingId || booking.id)}
                       >
                         Approve
                       </button>
