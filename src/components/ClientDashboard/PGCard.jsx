@@ -15,7 +15,8 @@ const PGCard = ({ pg }) => {
         cursor: "pointer",
         display: "flex",
         flexDirection: "column",
-        maxWidth: 240,
+        width: "100%",
+        maxWidth: "320px",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-3px)";
@@ -37,12 +38,16 @@ const PGCard = ({ pg }) => {
       >
         {pg.imageUrl ? (
           <img
-            src={pg.imageUrl}
+            src={pg.imageUrl.startsWith('http') ? pg.imageUrl : `http://localhost:8888${pg.imageUrl}`}
             alt={pg.propertyName}
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
+            }}
+            onError={(e) => {
+              e.target.style.display = "none";
+              e.target.parentElement.innerHTML = '<span style="fontSize: 40px; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center">🏠</span>';
             }}
           />
         ) : (

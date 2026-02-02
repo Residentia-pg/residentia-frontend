@@ -15,7 +15,9 @@ const ClientView = () => {
       try {
         const res = await API.get(`/api/owner/bookings/${bookingId}`);
         setBooking(res.data);
-      } catch {
+      } catch (err) {
+        console.error("Error fetching booking:", err);
+        alert("Failed to load booking details");
         setBooking(null);
       } finally {
         setLoading(false);
@@ -23,6 +25,29 @@ const ClientView = () => {
     };
     fetchBooking();
   }, [bookingId]);
+
+  const handleConfirm = async () => {
+    try {
+      await API.put(`/api/owner/bookings/${bookingId}/confirm`);
+      alert("Booking confirmed successfully!");
+      navigate(-1);
+    } catch (err) {
+      console.error("Error confirming booking:", err);
+      alert("Failed to confirm booking");
+    }
+  };
+
+  const handleReject = async () => {
+    if (!window.confirm("Are you sure you want to reject this booking?")) return;
+    try {
+      await API.put(`/api/owner/bookings/${bookingId}/reject`);
+      alert("Booking rejected");
+      navigate(-1);
+    } catch (err) {
+      console.error("Error rejecting booking:", err);
+      alert("Failed to reject booking");
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
   if (!booking) return <div>Booking not found.</div>;
@@ -54,14 +79,19 @@ const ClientView = () => {
             <Detail label="Status" value={booking.status} />
             {/* Add more fields as needed */}
           </div>
-          <div className="d-flex gap-3 mt-4">
-            <button className="btn btn-success flex-grow-1">
-              Approve Request
-            </button>
-            <button className="btn btn-outline-danger flex-grow-1">
-              Reject Request
-            </button>
-          </div>
+          {booking.status === "PENDING" && (
+            <div className="d-flex gap-3 mt-4">
+              <button className="btn btn-success flex-grow-1" onClick={handleConfirm}>
+                Approve Request
+              </button>
+              <button className="btn btn-outline-danger flex-grow-1" onClick={handleReject}>
+                Reject Request
+              </button>
+            </div>
+          )}
+          {booking.status === "CONFIRMED" && (
+            <div className="alert alert-success mt-4">✓ Booking Already Confirmed</div>
+          )}
         </div>
       </div>
     </div>

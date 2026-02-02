@@ -13,8 +13,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-width: 750px;
-  margin-top: 2rem ;
-  margin-left: 18rem;
+  margin: 2rem auto;
 }
 
 .owner-card {

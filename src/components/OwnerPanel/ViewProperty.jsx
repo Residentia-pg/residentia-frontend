@@ -11,6 +11,9 @@ const ViewProperty = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   useEffect(() => {
     fetchProperty();
@@ -19,8 +22,10 @@ const ViewProperty = () => {
   const fetchProperty = async () => {
     try {
       setLoading(true);
-      const response = await API.get(`/api/owner/pgs/${id}`);
-      console.log("Property details:", response.data);
+      // Add cache busting to prevent stale data
+      const response = await API.get(`/api/owner/pgs/${id}?t=${Date.now()}`);
+      console.log("📥 Property details fetched:", response.data);
+      console.log("📷 Image URL:", response.data.imageUrl);
       setProperty(response.data);
       setEditData(response.data);
     } catch (error) {
@@ -37,6 +42,42 @@ const ViewProperty = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedImages(files);
+
+    // Create preview URLs
+    const previews = files.map(file => URL.createObjectURL(file));
+    setImagePreviewUrls(previews);
+  };
+
+  const uploadImages = async () => {
+    if (selectedImages.length === 0) return [];
+
+    setUploadingImages(true);
+    const uploadedUrls = [];
+
+    try {
+      for (const image of selectedImages) {
+        const formData = new FormData();
+        formData.append("file", image);
+
+        const response = await API.post("/api/files/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+
+        uploadedUrls.push(response.data.url);
+      }
+
+      return uploadedUrls;
+    } catch (error) {
+      console.error("Failed to upload images:", error);
+      throw error;
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   const handleSave = async () => {
@@ -61,6 +102,15 @@ const ViewProperty = () => {
     try {
       setIsSaving(true);
       
+      // Upload images first if new images were selected
+      let updatedImageUrl = editData.imageUrl;
+      if (selectedImages.length > 0) {
+        console.log("📤 Uploading new images...", selectedImages);
+        const imageUrls = await uploadImages();
+        updatedImageUrl = imageUrls.join(",");
+        console.log("✅ Images uploaded successfully:", updatedImageUrl);
+      }
+      
       // Validate property data exists
       if (!property || !property.propertyId) {
         toast.error("Property data is missing. Please reload and try again.");
@@ -72,49 +122,55 @@ const ViewProperty = () => {
         return;
       }
       
-      // Calculate what fields have changed
-      const changes = {};
-      const fieldsToCheck = [
-        'propertyName', 'address', 'city', 'state', 'pincode', 
-        'rentAmount', 'sharingType', 'maxCapacity', 'availableBeds', 
-        'foodIncluded', 'description', 'mapLink', 'imageUrl', 'amenities'
-      ];
-      
-      let hasChanges = false;
-      fieldsToCheck.forEach(field => {
-        if (property[field] !== editData[field]) {
-          changes[field] = editData[field];
-          hasChanges = true;
-        }
-      });
-      
-      if (!hasChanges) {
-        toast.info("No changes detected");
-        setIsEditing(false);
-        return;
-      }
-      
-      // Create a change request instead of directly updating
-      const changeRequest = {
-        property: { id: parseInt(property.propertyId) },
-        owner: { id: parseInt(property.ownerId) },
-        changeType: "UPDATE",
-        changeDetails: JSON.stringify(changes),
-        status: "PENDING"
+      // Direct property update using the updated image URL
+      const propertyUpdateDTO = {
+        propertyName: editData.propertyName,
+        address: editData.address,
+        city: editData.city,
+        state: editData.state,
+        pincode: editData.pincode,
+        rentAmount: parseInt(editData.rentAmount),
+        sharingType: editData.sharingType,
+        maxCapacity: parseInt(editData.maxCapacity),
+        availableBeds: parseInt(editData.availableBeds),
+        foodIncluded: editData.foodIncluded,
+        description: editData.description,
+        mapLink: editData.mapLink,
+        imageUrl: updatedImageUrl,  // Use the updated image URL
+        amenities: editData.amenities,
+        status: editData.status || "ACTIVE"
       };
       
-      console.log("Submitting change request:", changeRequest);
+      console.log("🔄 Sending update to backend:", propertyUpdateDTO);
+      console.log("📷 Image URL being sent:", updatedImageUrl);
       
-      const response = await API.post("/api/owner/change-request", changeRequest);
+      const response = await API.put(`/api/owner/pgs/${property.propertyId}`, propertyUpdateDTO);
+      console.log("✅ Backend response:", response.data);
+      console.log("📷 Updated image URL from backend:", response.data.imageUrl);
       
+      // Clear image selection states
+      setSelectedImages([]);
+      setImagePreviewUrls([]);
+      
+      // Exit editing mode
       setIsEditing(false);
-      toast.success("✅ Change request submitted successfully! Status: PENDING. Waiting for admin approval.");
       
-      // Optionally reload property data
+      toast.success("✅ Property updated successfully!");
+      
+      // Reload property data to show updated information (with cache busting)
+      console.log("🔄 Reloading property data...");
       await fetchProperty();
+      
+      // Optional: Navigate back to My Properties after a delay
+      setTimeout(() => {
+        console.log("🔙 Navigating back to dashboard...");
+        navigate("/owner-dashboard");
+      }, 1500);
+      
     } catch (error) {
-      console.error("Failed to submit change request:", error);
-      const errorMsg = error.response?.data?.message || error.response?.data || error.message || "Failed to submit change request";
+      console.error("❌ Failed to update property:", error);
+      console.error("Error details:", error.response?.data);
+      const errorMsg = error.response?.data?.message || error.response?.data || error.message || "Failed to update property";
       toast.error("❌ " + errorMsg);
     } finally {
       setIsSaving(false);
@@ -124,6 +180,8 @@ const ViewProperty = () => {
   const handleCancel = () => {
     // Reset editData to the current property to discard changes
     setEditData({...property});
+    setSelectedImages([]);
+    setImagePreviewUrls([]);
     setIsEditing(false);
   };
 
@@ -232,7 +290,7 @@ const ViewProperty = () => {
               <div style={{ width: "100%", height: "100%", position: "relative" }}>
                 {editData?.imageUrl ? (
                   <img
-                    src={editData.imageUrl}
+                    src={editData.imageUrl.startsWith('http') ? editData.imageUrl : `http://localhost:8888${editData.imageUrl}`}
                     alt={editData.propertyName}
                     style={{
                       width: "100%",
@@ -269,7 +327,7 @@ const ViewProperty = () => {
               <>
                 {editData?.imageUrl ? (
                   <img
-                    src={editData.imageUrl}
+                    src={editData.imageUrl.startsWith('http') ? editData.imageUrl : `http://localhost:8888${editData.imageUrl}`}
                     alt={editData.propertyName}
                     style={{
                       width: "100%",
@@ -333,19 +391,19 @@ const ViewProperty = () => {
                     disabled={isSaving}
                     style={{
                       padding: "10px 20px",
-                      backgroundColor: isSaving ? "#9CA3AF" : "#10B981",
+                      backgroundColor: (isSaving || uploadingImages) ? "#9CA3AF" : "#10B981",
                       color: "white",
                       border: "none",
                       borderRadius: "8px",
-                      cursor: isSaving ? "not-allowed" : "pointer",
+                      cursor: (isSaving || uploadingImages) ? "not-allowed" : "pointer",
                       fontSize: "14px",
                       fontWeight: "600",
                       transition: "background-color 0.2s ease"
                     }}
-                    onMouseEnter={(e) => !isSaving && (e.target.style.backgroundColor = "#059669")}
-                    onMouseLeave={(e) => !isSaving && (e.target.style.backgroundColor = "#10B981")}
+                    onMouseEnter={(e) => !(isSaving || uploadingImages) && (e.target.style.backgroundColor = "#059669")}
+                    onMouseLeave={(e) => !(isSaving || uploadingImages) && (e.target.style.backgroundColor = "#10B981")}
                   >
-                    {isSaving ? "💾 Saving..." : "💾 Save Changes"}
+                    {uploadingImages ? "📤 Uploading Images..." : isSaving ? "💾 Saving..." : "💾 Save Changes"}
                   </button>
                   <button
                     onClick={handleCancel}
@@ -723,7 +781,7 @@ const ViewProperty = () => {
               )}
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             {isEditing && (
               <div style={{ marginBottom: "32px" }}>
                 <h3 style={{
@@ -732,22 +790,46 @@ const ViewProperty = () => {
                   color: "#1F2937",
                   margin: "0 0 12px 0"
                 }}>
-                  Image URL
+                  Property Images
                 </h3>
                 <input
-                  type="text"
-                  value={editData?.imageUrl || ""}
-                  onChange={(e) => handleEditChange("imageUrl", e.target.value)}
-                  placeholder="https://example.com/image.jpg"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageSelect}
                   style={{
                     width: "100%",
                     padding: "10px 12px",
                     borderRadius: "8px",
                     border: "1px solid #D1D5DB",
                     fontSize: "14px",
-                    boxSizing: "border-box"
+                    boxSizing: "border-box",
+                    backgroundColor: "#ffffff"
                   }}
                 />
+                <small style={{ color: "#6b7280", marginTop: "5px", display: "block" }}>
+                  Select new images to replace existing ones (JPG, PNG, GIF)
+                </small>
+                
+                {imagePreviewUrls.length > 0 && (
+                  <div style={{ marginTop: "15px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                    {imagePreviewUrls.map((url, index) => (
+                      <div key={index} style={{ position: "relative" }}>
+                        <img
+                          src={url}
+                          alt={`Preview ${index + 1}`}
+                          style={{
+                            width: "150px",
+                            height: "150px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                            border: "2px solid #D1D5DB"
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -759,7 +841,7 @@ const ViewProperty = () => {
                 color: "#1F2937",
                 margin: "0 0 16px 0"
               }}>
-                Amenities
+                {isEditing ? "Amenities" : "What this place offers"}
               </h3>
               {isEditing ? (
                 <div style={{
@@ -802,27 +884,50 @@ const ViewProperty = () => {
                 </div>
               ) : (
                 <div style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "12px"
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gap: "16px"
                 }}>
-                  {amenitiesList.length > 0 ? amenitiesList.map((amenity, index) => (
-                    <span
-                      key={index}
-                      style={{
-                        display: "inline-block",
-                        padding: "8px 16px",
-                        backgroundColor: "#DBEAFE",
-                        color: "#1E40AF",
-                        borderRadius: "20px",
-                        fontSize: "14px",
-                        fontWeight: "500"
-                      }}
-                    >
-                      ✓ {amenity}
-                    </span>
-                  )) : (
-                    <p style={{ color: "#9CA3AF" }}>No amenities listed</p>
+                  {amenitiesList.length > 0 ? amenitiesList.map((amenity, index) => {
+                    const amenityLower = amenity.toLowerCase();
+                    let icon = "📘";
+                    if (amenityLower.includes('wifi') || amenityLower.includes('wi-fi')) icon = '📶';
+                    else if (amenityLower.includes('parking')) icon = '🏎️';
+                    else if (amenityLower.includes('gym')) icon = '🏋️';
+                    else if (amenityLower.includes('food') || amenityLower.includes('meal')) icon = '🍽️';
+                    else if (amenityLower.includes('laundry') || amenityLower.includes('washing')) icon = '🧦';
+                    else if (amenityLower.includes('ac') || amenityLower.includes('air')) icon = '❄️';
+                    
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "12px",
+                          backgroundColor: "#ffffff",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                          color: "#374151",
+                          transition: "all 0.2s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = "#6366f1";
+                          e.currentTarget.style.backgroundColor = "#f5f3ff";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = "#e5e7eb";
+                          e.currentTarget.style.backgroundColor = "#ffffff";
+                        }}
+                      >
+                        <span style={{ fontSize: "1.5rem" }}>{icon}</span>
+                        <span>{amenity}</span>
+                      </div>
+                    );
+                  }) : (
+                    <p style={{ color: "#9CA3AF", gridColumn: "1 / -1" }}>No amenities listed</p>
                   )}
                 </div>
               )}

@@ -153,24 +153,24 @@ const DashboardContent = () => {
 
       <h3 className={styles.subTitle}>Recent Bookings</h3>
 
-      <div className={styles.tableCard}>
+      <div className={styles.tableWrapper}>
         <div className="table-responsive">
-          <table className={`table table-dark ${styles.noMargin}`}>
+          <table className="table table-hover" style={{ marginBottom: 0 }}>
             <thead>
-              <tr>
-                <th className={styles.th}>Property</th>
-                <th className={styles.th}>Tenant</th>
-                <th className={styles.th}>Amount</th>
-                <th className={styles.th}>Status</th>
+              <tr className={styles.tableHeadRow}>
+                <th className={styles.tableHead}>Property</th>
+                <th className={styles.tableHead}>Tenant</th>
+                <th className={styles.tableHead}>Amount</th>
+                <th className={styles.tableHead}>Status</th>
               </tr>
             </thead>
             <tbody>
               {recentBookings.map((booking, idx) => (
-                <tr key={idx} className={styles.tr}>
-                  <td className={styles.td}>{booking.property?.name}</td>
-                  <td className={styles.td}>{booking.tenantName}</td>
-                  <td className={styles.td}>{booking.amount}</td>
-                  <td className={styles.td}>
+                <tr key={idx} className={styles.tableRow}>
+                  <td className={styles.tableCell}>{booking.propertyName || 'N/A'}</td>
+                  <td className={styles.tableCell}>{booking.tenantName}</td>
+                  <td className={styles.tableCell}>{booking.amount}</td>
+                  <td className={styles.tableCell}>
                     <span
                       className={`${styles.statusBadge} ${booking.status === "CONFIRMED"
                           ? styles.confirmed

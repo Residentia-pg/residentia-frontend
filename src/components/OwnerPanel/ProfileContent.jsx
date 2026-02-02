@@ -17,6 +17,14 @@ const ProfileContent = () => {
   });
 
   const [loading, setLoading] = useState(true);
+  const [mobileError, setMobileError] = useState("");
+  const [alternateError, setAlternateError] = useState("");
+
+  // Mobile validation function
+  const validateMobile = (mobile) => {
+    const mobileRegex = /^[0-9]{10}$/;
+    return mobileRegex.test(mobile);
+  };
 
   useEffect(() => {
     loadProfile();
@@ -38,6 +46,20 @@ const ProfileContent = () => {
   };
 
   const updateProfile = async () => {
+    // Validate mobile number
+    if (owner.mobileNumber && !validateMobile(owner.mobileNumber)) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      setMobileError("Invalid mobile number format");
+      return;
+    }
+
+    // Validate alternate contact if provided
+    if (owner.alternateContact && !validateMobile(owner.alternateContact)) {
+      toast.error("Please enter a valid 10-digit alternate contact number");
+      setAlternateError("Invalid mobile number format");
+      return;
+    }
+
     try {
       await API.put("/api/owner/profile", owner);
       toast.success("Profile updated successfully!");
@@ -80,12 +102,21 @@ const ProfileContent = () => {
       <div style={{ marginBottom: "20px" }}>
         <label>Mobile Number</label>
         <input
-          className="form-control"
+          className={`form-control ${mobileError && owner.mobileNumber ? 'is-invalid' : ''}`}
           value={owner.mobileNumber || ""}
-          onChange={(e) =>
-            setOwner({ ...owner, mobileNumber: e.target.value })
-          }
+          onChange={(e) => {
+            const value = e.target.value;
+            setOwner({ ...owner, mobileNumber: value });
+            if (value && !validateMobile(value)) {
+              setMobileError("Enter a valid 10-digit mobile number");
+            } else {
+              setMobileError("");
+            }
+          }}
         />
+        {mobileError && owner.mobileNumber && (
+          <div className="invalid-feedback d-block">{mobileError}</div>
+        )}
       </div>
 
       <div style={{ marginBottom: "20px" }}>
@@ -113,12 +144,21 @@ const ProfileContent = () => {
       <div style={{ marginBottom: "20px" }}>
         <label>Alternate Contact</label>
         <input
-          className="form-control"
+          className={`form-control ${alternateError && owner.alternateContact ? 'is-invalid' : ''}`}
           value={owner.alternateContact || ""}
-          onChange={(e) =>
-            setOwner({ ...owner, alternateContact: e.target.value })
-          }
+          onChange={(e) => {
+            const value = e.target.value;
+            setOwner({ ...owner, alternateContact: value });
+            if (value && !validateMobile(value)) {
+              setAlternateError("Enter a valid 10-digit mobile number");
+            } else {
+              setAlternateError("");
+            }
+          }}
         />
+        {alternateError && owner.alternateContact && (
+          <div className="invalid-feedback d-block">{alternateError}</div>
+        )}
       </div>
 
       <button className="btn btn-primary" onClick={updateProfile}>

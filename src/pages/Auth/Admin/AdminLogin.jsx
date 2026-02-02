@@ -8,13 +8,26 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const navigate = useNavigate();
+
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
       toast.error("Please fill in all fields");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast.error("Please enter a valid email address");
+      setEmailError("Invalid email format");
       return;
     }
 
@@ -57,12 +70,23 @@ const AdminLogin = () => {
             <label className="form-label">Email Address</label>
             <input
               type="email"
-              className="form-control"
+              className={`form-control ${emailError && email ? 'is-invalid' : ''}`}
               placeholder="Enter your admin email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setEmail(value);
+                if (value && !validateEmail(value)) {
+                  setEmailError("Please enter a valid email address");
+                } else {
+                  setEmailError("");
+                }
+              }}
               required
             />
+            {emailError && email && (
+              <div className="invalid-feedback d-block">{emailError}</div>
+            )}
           </div>
 
           <div className="mb-4">

@@ -59,9 +59,11 @@ const ReviewsContent = () => {
                 <h5 className={styles.activityTitle}>
                   {review.user?.name || "Anonymous"}
                 </h5>
-                <div className={styles.ratingValue}>
-                  {[...Array(review.rating || 0)].map((_, i) => (
-                    <span key={i}>⭐</span>
+                <div style={{ fontSize: '1.2rem' }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} style={{ color: star <= (review.rating || 0) ? '#FFD700' : '#ddd' }}>
+                      ★
+                    </span>
                   ))}
                 </div>
               </div>

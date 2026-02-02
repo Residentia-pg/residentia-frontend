@@ -17,7 +17,11 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    toast.info("You are already on the Login / Sign Up page");
+    // User is already on login page
+  };
+
+  const handleBackToBrowse = () => {
+    navigate("/");
   };
 
   // ===== CLIENT LOGIN =====
@@ -100,6 +104,9 @@ export default function Home() {
             </span>
           </a>
           <div className="d-none d-md-flex gap-4 align-items-center">
+            <a href="/" className="nav-link-custom">
+              ← Back to Browse
+            </a>
             <a href="/about-us" className="nav-link-custom">
               About Us
             </a>
@@ -109,12 +116,6 @@ export default function Home() {
             <a href="/help" className="nav-link-custom">
               Help
             </a>
-            <button
-              className="btn btn-sm nav-cta-btn"
-              onClick={handleLoginClick}
-            >
-              Login / Sign Up
-            </button>
           </div>
         </div>
       </nav>

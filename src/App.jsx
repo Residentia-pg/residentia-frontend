@@ -5,6 +5,7 @@ import "./App.css";
 
 // ===== PAGES =====
 import Home from "./pages/Landing/Home";
+import PublicBrowse from "./pages/Landing/PublicBrowse";
 import ClientRegister from "./pages/Auth/Client/ClientRegister";
 import OwnerRegister from "./pages/Auth/Owner/OwnerRegister";
 import AdminLogin from "./pages/Auth/Admin/AdminLogin";
@@ -29,13 +30,17 @@ function App() {
   return (
     <Routes>
       {/* ===== PUBLIC ROUTES ===== */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<PublicBrowse />} />
+      <Route path="/login" element={<Home />} />
       <Route path="/about-us" element={<About />} />
       <Route path="/contact-us" element={<Contact />} />
       <Route path="/help" element={<Help />} />
       <Route path="/register-client" element={<ClientRegister />} />
       <Route path="/register-owner" element={<OwnerRegister />} />
       <Route path="/admin-login" element={<AdminLogin />} />
+      
+      {/* Public property viewing - no auth required */}
+      <Route path="/property/:id" element={<ClientPropertyView />} />
 
       {/* ===== ADMIN ROUTES ===== */}
       <Route
@@ -56,9 +61,23 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/property/:id" element={<ClientPropertyView />} />
-      <Route path="/book/:id" element={<ClientBookingPage />} />
-      <Route path="/payment" element={<Payment />} />
+      {/* Protected booking routes - require authentication */}
+      <Route
+        path="/book/:id"
+        element={
+          <ProtectedRoute role="CLIENT">
+            <ClientBookingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payment"
+        element={
+          <ProtectedRoute role="CLIENT">
+            <Payment />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ===== ADMIN ROUTES (FROM V2) ===== */}
       
@@ -92,7 +111,7 @@ function App() {
       />
 
       {/* Catch-all */}
-      <Route path="*" element={<Home />} />
+      <Route path="*" element={<PublicBrowse />} />
     </Routes>
   );
 }

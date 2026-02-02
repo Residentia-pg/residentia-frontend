@@ -51,7 +51,7 @@ const Listings = ({ pgListings, filter }) => {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+        gridTemplateColumns: "repeat(3, 1fr)",
         gap: "20px",
         margin: "24px 0",
       }}

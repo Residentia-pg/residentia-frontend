@@ -1,13 +1,13 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8888",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8888",
   headers: { "Content-Type": "application/json" },
 });
 
 API.interceptors.request.use((config) => {
-  const auth = JSON.parse(localStorage.getItem("pg_auth") );
-  if (auth.token) {
+  const auth = JSON.parse(localStorage.getItem("pg_auth") || "{}");
+  if (auth && auth.token) {
     config.headers.Authorization = `Bearer ${auth.token}`;
   }
   return config;

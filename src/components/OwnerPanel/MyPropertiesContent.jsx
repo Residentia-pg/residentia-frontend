@@ -13,13 +13,27 @@ const MyPropertiesContent = () => {
 
   useEffect(() => {
     fetchProperties();
+    
+    // Add event listener to refresh when window regains focus
+    const handleFocus = () => {
+      console.log("Window focused, refreshing properties...");
+      fetchProperties();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const response = await API.get("/api/owner/pgs");
-      console.log("Properties fetched:", response.data);
+      // Add cache busting to prevent stale data
+      const response = await API.get(`/api/owner/pgs?t=${Date.now()}`);
+      console.log("📥 Properties fetched:", response.data);
+      console.log("📷 Image URLs:", response.data.map(p => ({ id: p.propertyId, imageUrl: p.imageUrl })));
       setPgs(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to load properties:", error);
@@ -199,12 +213,15 @@ const MyPropertiesContent = () => {
               }}>
                 {pg.imageUrl ? (
                   <img
-                    src={pg.imageUrl}
+                    src={pg.imageUrl.startsWith('http') ? pg.imageUrl : `http://localhost:8888${pg.imageUrl}`}
                     alt={pg.propertyName}
                     style={{
                       width: "100%",
                       height: "100%",
                       objectFit: "cover"
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = "none";
                     }}
                   />
                 ) : (
