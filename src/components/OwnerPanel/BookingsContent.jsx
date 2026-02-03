@@ -38,60 +38,99 @@ const BookingsContent = () => {
     <div>
       <h2 className={styles.sectionTitle}>All Bookings</h2>
 
-      <div className={styles.tableCard}>
-        <table className={`table table-dark ${styles.noMargin}`}>
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th>Tenant</th>
-              <th>Phone</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+      {bookings.length === 0 ? (
+        <p className={styles.emptyText}>No bookings yet</p>
+      ) : (
+        <div className={styles.bookingsGrid}>
+          {bookings.map((b) => (
+            <div key={b.bookingId} className={styles.bookingCardOwner}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.propertyTitle}>{b.propertyName}</h3>
+                <span
+                  className={
+                    b.status === "CONFIRMED"
+                      ? styles.confirmed
+                      : styles.pending
+                  }
+                >
+                  {b.status}
+                </span>
+              </div>
 
-          <tbody>
-            {bookings.map((b) => (
-              <tr key={b.id}>
-                <td>{b.property?.name}</td>
-                <td>{b.tenantName}</td>
-                <td>{b.tenantPhone}</td>
-                <td>₹{b.amount}</td>
-                <td>
-                  <span
-                    className={
-                      b.status === "CONFIRMED"
-                        ? styles.confirmed
-                        : styles.pending
-                    }
-                  >
-                    {b.status}
+              <div className={styles.guestDetails}>
+                <div className={styles.guestAvatar}>👤</div>
+                <div>
+                  <div className={styles.guestName}>{b.tenantName}</div>
+                  <div className={styles.guestPhone}>📞 {b.tenantPhone}</div>
+                </div>
+              </div>
+
+              <div className={styles.dateSection}>
+                <div className={styles.dateBox} style={{ flex: 'none' }}>
+                  <div className={styles.dateLabel}>CHECK-IN DATE</div>
+                  <div className={styles.dateValue}>
+                    {b.checkInDate ? new Date(b.checkInDate).toLocaleDateString('en-GB') : 'N/A'}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.amountSection}>
+                <span className={styles.amountLabel}>Total Amount</span>
+                <span className={styles.amountValue}>₹{(b.amount || 0).toLocaleString()}</span>
+              </div>
+
+              {/* Payment Status */}
+              {b.paymentStatus && (
+                <div className={styles.paymentSection} style={{ 
+                  marginTop: '10px', 
+                  padding: '8px 12px', 
+                  borderRadius: '6px',
+                  backgroundColor: b.paymentStatus === 'PAID' ? '#e8f5e9' : 
+                                   b.paymentStatus === 'PENDING' ? '#fff3e0' : '#ffebee',
+                  border: `1px solid ${b.paymentStatus === 'PAID' ? '#4CAF50' : 
+                                        b.paymentStatus === 'PENDING' ? '#FF9800' : '#f44336'}`
+                }}>
+                  <span style={{ 
+                    fontWeight: '600',
+                    color: b.paymentStatus === 'PAID' ? '#2e7d32' : 
+                           b.paymentStatus === 'PENDING' ? '#f57c00' : '#c62828'
+                  }}>
+                    Payment: {b.paymentStatus}
+                    {b.paymentStatus === 'PAID' && ' ✓'}
                   </span>
-                </td>
-                <td className="d-flex gap-2">
-                  <button
-                    className="btn btn-sm btn-outline-light"
-                    onClick={() => navigate(`/owner/client/${b.id}`)}
-                  >
-                    View
-                  </button>
-
-                  {b.status === "PENDING" && (
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => confirmBooking(b.id)}
-                    >
-                      Confirm
-                    </button>
+                  {b.razorpayPaymentId && (
+                    <div style={{ 
+                      fontSize: '0.85em', 
+                      marginTop: '4px',
+                      color: '#666'
+                    }}>
+                      ID: {b.razorpayPaymentId}
+                    </div>
                   )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
+                </div>
+              )}
 
-        </table>
-      </div>
+              <div className={styles.cardActions}>
+                <button
+                  className={styles.viewBtn}
+                  onClick={() => navigate(`/owner/client/${b.bookingId}`)}
+                >
+                  View Details
+                </button>
+
+                {b.status === "PENDING" && (
+                  <button
+                    className={styles.confirmBtn}
+                    onClick={() => confirmBooking(b.bookingId)}
+                  >
+                    ✔ Confirm Booking
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,9 +1,11 @@
 import React,{useState} from"react";
 import{toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
+import { frontRegisterClient, frontLogin } from "../../../utils/frontAuth";
 import "./ClientRegister.css";
 
 const ClientRegister=()=>{
+    const [isLogin, setIsLogin] = useState(false);
     const[form,setForm]  =useState({
         name:"",
         email:"",
@@ -17,16 +19,70 @@ const ClientRegister=()=>{
     });
 
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [emailError, setEmailError] = useState("");
 
-    const handleChange = (e) =>{
-        setForm({...form,[e.target.name]:e.target.value});
+    // Email validation function
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     };
 
-    const handleRegister = () =>{
+    const handleChange = (e) =>{
+        const { name, value } = e.target;
+        setForm({...form, [name]: value});
+        
+        // Validate email on change
+        if (name === "email") {
+            if (value && !validateEmail(value)) {
+                setEmailError("Please enter a valid email address");
+            } else {
+                setEmailError("");
+            }
+        }
+    };
+
+    const handleLogin = async () => {
+        const { email, password } = form;
+
+        if (!email || !password) {
+            toast.error("Email and password are required");
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            toast.error("Please enter a valid email address");
+            setEmailError("Invalid email format");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const result = await frontLogin(email, password, "CLIENT");
+            if (result.success) {
+                toast.success("Login Successful");
+                navigate("/client");
+            } else {
+                toast.error(result.message || "Login failed");
+            }
+        } catch (error) {
+            toast.error(error.message || "Login failed");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRegister = async () =>{
         const{name,email,mobile,dob,gender,occupation,address,password,confirmPassword} = form;
 
         if(!name || !email || !mobile || !dob ||!gender ||!occupation ||!address || !password ||!confirmPassword){
             toast.error("All fields are required");
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            toast.error("Please enter a valid email address");
+            setEmailError("Invalid email format");
             return;
         }
 
@@ -46,8 +102,28 @@ const ClientRegister=()=>{
             return;
         }
 
-        toast.success("Client registered Successfully!!!");
-        navigate("/");
+        setLoading(true);
+        try {
+            const res = await frontRegisterClient({
+                email,
+                name,
+                mobileNumber: mobile,
+                password
+            });
+
+            if (res.success) {
+                toast.success("Client registered Successfully!!!");
+                navigate("/");
+            } else {
+                const message = res.message?.message || res.message || "Registration failed";
+                toast.error(message);
+            }
+        } catch (err) {
+            console.error("Register error", err);
+            toast.error("An error occurred during registration");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return(
@@ -59,28 +135,85 @@ const ClientRegister=()=>{
                 >
                 ← Back
                 </button>
-                <h3 className="text-center mb-4">🏠Register, Join Residentia family!!</h3>
+                <h3 className="text-center mb-4">
+                    🏠 {isLogin ? "Client Login" : "Register, Join Residentia family!!"}
+                </h3>
+
+                {/* Toggle Buttons */}
+                <div className="d-flex gap-2 mb-4">
+                    <button
+                        className={`btn w-50 ${!isLogin ? 'btn-primary' : 'btn-outline-primary'}`}
+                        onClick={() => setIsLogin(false)}
+                    >
+                        Register
+                    </button>
+                    <button
+                        className={`btn w-50 ${isLogin ? 'btn-primary' : 'btn-outline-primary'}`}
+                        onClick={() => setIsLogin(true)}
+                    >
+                        Login
+                    </button>
+                </div>
+
+                {/* Login Form */}
+                {isLogin ? (
+                    <>
+                        <div className="mb-3">
+                            <input
+                                name="email"
+                                type="email"
+                                placeholder="Email"
+                                className={`form-control ${emailError && form.email ? 'is-invalid' : ''}`}
+                                onChange={handleChange}
+                                value={form.email}
+                            />
+                            {emailError && form.email && (
+                                <div className="invalid-feedback d-block">{emailError}</div>
+                            )}
+                        </div>
+                        <input
+                            name="password"
+                            type="password"
+                            placeholder="Password"
+                            className="form-control mb-4"
+                            onChange={handleChange}
+                        />
+                        <button className="btn btn-primary w-100" onClick={handleLogin} disabled={loading}>
+                            {loading ? "Logging in..." : "Login as Client"}
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        {/* Register Form */}
 
                 <input
                     name="name"
                     placeholder="Full Name"
                     className="form-control mb-3"
                     onChange={handleChange}
+                    value={form.name}
                 />
 
-                <input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                <div className="mb-3">
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="Email"
+                        className={`form-control ${emailError && form.email ? 'is-invalid' : ''}`}
+                        onChange={handleChange}
+                        value={form.email}
+                    />
+                    {emailError && form.email && (
+                        <div className="invalid-feedback d-block">{emailError}</div>
+                    )}
+                </div>
 
                 <input
                     name="mobile"
                     placeholder="Mobile Number"
                     className="form-control mb-3"
                     onChange={handleChange}
+                    value={form.mobile}
                 />
 
                 <input
@@ -131,9 +264,11 @@ const ClientRegister=()=>{
                     className="form-control mb-4"
                     onChange={handleChange}
                 />
-                <button className="btn btn-primary w-100" onClick={handleRegister}>
-                    Register as Client
+                <button className="btn btn-primary w-100" onClick={handleRegister} disabled={loading}>
+                    {loading ? "Registering..." : "Register as Client"}
                 </button>
+                    </>
+                )}
         </div>
     </div>
     );

@@ -1,18 +1,15 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8888",
   headers: { "Content-Type": "application/json" },
 });
 
 // Attach JWT to every request
 API.interceptors.request.use((config) => {
-  const raw = localStorage.getItem("pg_auth");
-  if (raw) {
-    const auth = JSON.parse(raw);
-    if (auth?.token) {
-      config.headers.Authorization = `Bearer ${auth.token}`;
-    }
+  const auth = JSON.parse(localStorage.getItem("pg_auth") || "{}");
+  if (auth && auth.token) {
+    config.headers.Authorization = `Bearer ${auth.token}`;
   }
   return config;
 });

@@ -77,6 +77,48 @@ const AdminDashboard = () => {
           {activeTab === "bookings" && <BookingsContent />}
           {activeTab === "reviews" && <ReviewsContent />}
           {activeTab === "requests" && <RequestsContent />}
+          
+          {/* Footer */}
+          <footer style={{
+            marginTop: "auto",
+            padding: "24px",
+            backgroundColor: "#F9FAFB",
+            color: "#374151",
+            borderTop: "2px solid #E0E7FF",
+            textAlign: "center"
+          }}>
+            <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "24px",
+                marginBottom: "16px",
+                textAlign: "left"
+              }}>
+                <div>
+                  <h4 style={{ color: "#6366F1", fontSize: "14px", fontWeight: "600", marginBottom: "8px" }}>🛠️ Admin Tools</h4>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>Manage platform</p>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>Monitor activities</p>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>System reports</p>
+                </div>
+                <div>
+                  <h4 style={{ color: "#6366F1", fontSize: "14px", fontWeight: "600", marginBottom: "8px" }}>📊 Analytics</h4>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>User statistics</p>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>Booking trends</p>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>Revenue reports</p>
+                </div>
+                <div>
+                  <h4 style={{ color: "#6366F1", fontSize: "14px", fontWeight: "600", marginBottom: "8px" }}>📞 Support</h4>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>admin@pgfinder.com</p>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>+91 98765 43210</p>
+                  <p style={{ fontSize: "12px", margin: "4px 0", color: "#6B7280" }}>24/7 Admin Support</p>
+                </div>
+              </div>
+              <div style={{ paddingTop: "16px", borderTop: "1px solid #E5E7EB" }}>
+                <p style={{ fontSize: "12px", margin: 0, color: "#9CA3AF" }}>&copy; 2026 PG Finder Admin Panel. All rights reserved.</p>
+              </div>
+            </div>
+          </footer>
         </main>
       </div>
     </div>

@@ -181,23 +181,22 @@ const BookingsContent = () => {
               <th className={styles.tableHead}>User</th>
               <th className={styles.tableHead}>Property</th>
               <th className={styles.tableHead}>Status</th>
-              <th className={styles.tableHead}>Actions</th>
           </tr>
           </thead>
 
           <tbody>
             {bookings.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center">
+                <td colSpan="4" className="text-center">
                   No bookings found
                 </td>
               </tr>
             ) : (
               bookings.map(booking => (
-                <tr key={booking.id}>
-                  <td>#{booking.id}</td>
-                  <td>{booking.user?.name || "N/A"}</td>
-                  <td>{booking.pg?.propertyName || "N/A"}</td>
+                <tr key={booking.bookingId || booking.id}>
+                  <td>#{booking.bookingId || booking.id}</td>
+                  <td>{booking.tenantName || "N/A"}</td>
+                  <td>{booking.propertyName || "N/A"}</td>
 
                   <td>
                     <span
@@ -209,26 +208,6 @@ const BookingsContent = () => {
                     >
                       {booking.status || "UNKNOWN"}
                     </span>
-                  </td>
-
-                  <td>
-                    {booking.status === "CONFIRMED" && (
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => cancel(booking.id)}
-                      >
-                        Cancel
-                      </button>
-                    )}
-
-                    {booking.status === "CANCELLED" && (
-                      <button
-                        className="btn btn-success btn-sm"
-                        onClick={() => restore(booking.id)}
-                      >
-                        Approve
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))

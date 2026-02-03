@@ -1,167 +1,158 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const PGCard = ({ pg }) => {
+  const navigate = useNavigate();
+
   return (
     <div
-      className="pg-card"
       style={{
-        backgroundColor: "#ffffff",
-        borderRadius: 8,
+        background: "#ffffff",
+        borderRadius: 14,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
         overflow: "hidden",
-        border: "1px solid #e5e7eb",
-        transition: "box-shadow 0.2s ease, transform 0.2s ease",
+        transition: "transform 0.2s, box-shadow 0.2s",
         cursor: "pointer",
-        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        maxWidth: "320px",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.08)";
+        e.currentTarget.style.transform = "translateY(-3px)";
+        e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.12)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.transform = "none";
+        e.currentTarget.style.boxShadow = "0 2px 10px rgba(0,0,0,0.08)";
       }}
     >
+      {/* Image */}
       <div
         style={{
-          backgroundColor: "#f3f4f6",
-          height: 180,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 64,
-          borderBottom: "1px solid #e5e7eb",
+          width: "100%",
+          height: 140,
+          background: "#f3f4f6",
+          position: "relative",
         }}
       >
-        {pg.image}
+        {pg.imageUrl ? (
+          <img
+            src={pg.imageUrl.startsWith('http') ? pg.imageUrl : `http://localhost:8888${pg.imageUrl}`}
+            alt={pg.propertyName}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+            onError={(e) => {
+              e.target.style.display = "none";
+              e.target.parentElement.innerHTML = '<span style="fontSize: 40px; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center">🏠</span>';
+            }}
+          />
+        ) : (
+          <span
+            style={{
+              fontSize: 40,
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            🏠
+          </span>
+        )}
       </div>
 
-      <div style={{ padding: 20 }}>
-        <h4
-          style={{
-            fontSize: 18,
-            fontWeight: 600,
-            marginBottom: 6,
-            color: "#1f2937",
-          }}
-        >
-          {pg.name}
-        </h4>
-        <p
-          style={{
-            color: "#6b7280",
-            fontSize: 14,
-            marginBottom: 16,
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-          }}
-        >
-          <span>📍</span> {pg.location}
-        </p>
-
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <div>
-            <span
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                color: "#059669",
-              }}
-            >
-              ₹{pg.price.toLocaleString()}
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                color: "#6b7280",
-                marginLeft: 4,
-              }}
-            >
-              /month
-            </span>
-          </div>
-          <div>
-            <span
-              style={{
-                backgroundColor: "#f3f4f6",
-                padding: "6px 12px",
-                borderRadius: 4,
-                fontSize: 12,
-                color: "#374151",
-                fontWeight: 500,
-                border: "1px solid #e5e7eb",
-              }}
-            >
-              {pg.sharing}
-            </span>
-          </div>
+      {/* Content */}
+      <div style={{ padding: "12px 14px", flex: 1 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: "#111827" }}>
+          {pg.propertyName}
         </div>
 
-        <div className="d-flex gap-2 mb-3 flex-wrap">
-          {pg.amenities.map((amenity, i) => (
+        <div style={{ fontSize: 13, color: "#6b7280", margin: "4px 0" }}>
+          📍 {pg.city}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: "#059669" }}>
+            ₹{(pg.rentAmount ?? 0).toLocaleString()}
+          </span>
+          <span style={{ fontSize: 12, color: "#6b7280" }}>/month</span>
+
+          {pg.sharingType && (
+            <span
+              style={{
+                fontSize: 11,
+                padding: "2px 8px",
+                background: "#f3f4f6",
+                borderRadius: 6,
+                border: "1px solid #e5e7eb",
+                color: "#374151",
+              }}
+            >
+              {pg.sharingType}
+            </span>
+          )}
+        </div>
+
+        {/* Amenities */}
+        <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+          {(typeof pg.amenities === "string"
+            ? pg.amenities.split(",").slice(0, 2)
+            : []
+          ).map((a, i) => (
             <span
               key={i}
               style={{
-                backgroundColor: "#eff6ff",
+                fontSize: 11,
+                background: "#eff6ff",
                 color: "#1e40af",
-                padding: "4px 10px",
-                borderRadius: 4,
-                fontSize: 12,
-                fontWeight: 500,
+                padding: "2px 8px",
+                borderRadius: 6,
               }}
             >
-              {amenity}
+              {a.trim()}
             </span>
           ))}
         </div>
+      </div>
 
-        <div className="d-flex gap-2">
-          <button
-            className="btn flex-grow-1"
-            style={{
-              backgroundColor: "transparent",
-              border: "1px solid #d1d5db",
-              color: "#374151",
-              padding: "10px 16px",
-              borderRadius: 6,
-              fontWeight: 500,
-              fontSize: 14,
-              transition: "all 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#f3f4f6";
-              e.currentTarget.style.borderColor = "#9ca3af";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.borderColor = "#d1d5db";
-            }}
-          >
-            View Details
-          </button>
-          <button
-            className="btn flex-grow-1"
-            style={{
-              backgroundColor: "#3b82f6",
-              border: "none",
-              color: "#ffffff",
-              padding: "10px 16px",
-              borderRadius: 6,
-              fontWeight: 600,
-              fontSize: 14,
-              transition: "background-color 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#2563eb";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#3b82f6";
-            }}
-          >
-            Book Now
-          </button>
-        </div>
+      {/* Actions */}
+      <div style={{ display: "flex", gap: 8, padding: "10px 14px" }}>
+        <button
+          style={{
+            flex: 1,
+            fontSize: 13,
+            padding: "6px 0",
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            background: "#fff",
+            cursor: "pointer",
+          }}
+          onClick={() => navigate(`/property/${pg.propertyId ?? pg.id}`)}
+        >
+          View
+        </button>
+
+        <button
+          style={{
+            flex: 1,
+            fontSize: 13,
+            padding: "6px 0",
+            borderRadius: 6,
+            border: "none",
+            background: "linear-gradient(90deg,#3b82f6,#06b6d4)",
+            color: "#fff",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+          onClick={() => navigate(`/book/${pg.propertyId ?? pg.id}`)}
+        >
+          Book
+        </button>
       </div>
     </div>
   );

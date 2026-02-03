@@ -1,5 +1,16 @@
 import API from "./api";
 
+// Get all properties (public - no auth required)
+export const getAllProperties = async () => {
+  try {
+    const response = await API.get("/api/client/properties");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    throw error.response?.data || error.message;
+  }
+};
+
 // Get all properties of logged owner
 export const getOwnerProperties = async () => {
   try {
@@ -49,4 +60,13 @@ export const deleteProperty = async (id) => {
   } catch (error) {
     throw error.response?.data || error.message;
   }
+};
+
+export default {
+  getAllProperties,
+  getOwnerProperties,
+  getPropertyById,
+  createProperty,
+  updateProperty,
+  deleteProperty,
 };

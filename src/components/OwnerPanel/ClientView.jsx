@@ -1,24 +1,56 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./Owner.module.css";
+import API from "../../api/api";
 
 const ClientView = () => {
   const { bookingId } = useParams();
   const navigate = useNavigate();
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const client = {
-    name: "Anand Kulkarni",
-    email: "anand.k@gmail.com",
-    mobile: "+91 9876543210",
-    gender: "Male",
-    dob: "10 Jan 1999",
-    occupation: "Software Engineer",
-    address: "phase 2, pune",
-    pgName: "Green Valley PG",
-    sharingType: "2-Sharing",
-    bookingPeriod: "Mar 2024 – Aug 2024",
-    status: "Pending",
+  useEffect(() => {
+    const fetchBooking = async () => {
+      try {
+        const res = await API.get(`/api/owner/bookings/${bookingId}`);
+        setBooking(res.data);
+      } catch (err) {
+        console.error("Error fetching booking:", err);
+        alert("Failed to load booking details");
+        setBooking(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBooking();
+  }, [bookingId]);
+
+  const handleConfirm = async () => {
+    try {
+      await API.put(`/api/owner/bookings/${bookingId}/confirm`);
+      alert("Booking confirmed successfully!");
+      navigate(-1);
+    } catch (err) {
+      console.error("Error confirming booking:", err);
+      alert("Failed to confirm booking");
+    }
   };
+
+  const handleReject = async () => {
+    if (!window.confirm("Are you sure you want to reject this booking?")) return;
+    try {
+      await API.put(`/api/owner/bookings/${bookingId}/reject`);
+      alert("Booking rejected");
+      navigate(-1);
+    } catch (err) {
+      console.error("Error rejecting booking:", err);
+      alert("Failed to reject booking");
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (!booking) return <div>Booking not found.</div>;
 
   return (
     <div className={styles.appWrapper}>
@@ -34,33 +66,32 @@ const ClientView = () => {
         </div>
       </nav>
 
-
       <div className="container py-4">
         <div className={styles.formCard}>
           <h4 className="mb-4">Booking ID: #{bookingId}</h4>
-
           <div className="row g-3">
-            <Detail label="Name" value={client.name} />
-            <Detail label="Email" value={client.email} />
-            <Detail label="Mobile" value={client.mobile} />
-            <Detail label="Gender" value={client.gender} />
-            <Detail label="Date of Birth" value={client.dob} />
-            <Detail label="Occupation" value={client.occupation} />
-            <Detail label="Address" value={client.address} />
-            <Detail label="PG Name" value={client.pgName} />
-            <Detail label="Sharing Type" value={client.sharingType} />
-            <Detail label="Booking Period" value={client.bookingPeriod} />
-            <Detail label="Status" value={client.status} />
+            <Detail label="Name" value={booking.tenantName} />
+            <Detail label="Email" value={booking.tenantEmail} />
+            <Detail label="Mobile" value={booking.tenantPhone} />
+            <Detail label="PG Name" value={booking.propertyName || booking.property?.propertyName} />
+            <Detail label="Sharing Type" value={booking.sharingType || booking.property?.sharingType} />
+            <Detail label="Check-in Date" value={booking.checkInDate} />
+            <Detail label="Status" value={booking.status} />
+            {/* Add more fields as needed */}
           </div>
-
-          <div className="d-flex gap-3 mt-4">
-            <button className="btn btn-success flex-grow-1">
-              Approve Request
-            </button>
-            <button className="btn btn-outline-danger flex-grow-1">
-              Reject Request
-            </button>
-          </div>
+          {booking.status === "PENDING" && (
+            <div className="d-flex gap-3 mt-4">
+              <button className="btn btn-success flex-grow-1" onClick={handleConfirm}>
+                Approve Request
+              </button>
+              <button className="btn btn-outline-danger flex-grow-1" onClick={handleReject}>
+                Reject Request
+              </button>
+            </div>
+          )}
+          {booking.status === "CONFIRMED" && (
+            <div className="alert alert-success mt-4">✓ Booking Already Confirmed</div>
+          )}
         </div>
       </div>
     </div>

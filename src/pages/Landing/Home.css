@@ -1,16 +1,16 @@
 /* /* Root layout */
 .home-page {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #f0f9ff 0%, #fdf4ff 100%);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Navbar */
 .home-navbar {
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
   padding: 1rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-bottom: 2px solid #e0e7ff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
 }
 
 .brand-icon {
@@ -29,7 +29,10 @@
 }
 
 .brand-highlight {
-  color: #3b82f6;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .nav-link-custom {
@@ -71,13 +74,13 @@
   padding: 0.5rem 1rem;
   margin-bottom: 1.5rem;
   border-radius: 6px;
-  background-color: #f0f9ff;
-  border: 1px solid #bae6fd;
+  background: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 100%);
+  border: 1px solid #e0e7ff;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #0369a1;
+  color: #6366f1;
 }
 
 .hero-pill-dot {
@@ -97,7 +100,10 @@
 }
 
 .hero-highlight {
-  color: #3b82f6;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-subtitle {
@@ -117,11 +123,11 @@
 }
 
 .hero-badge {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 2px solid #e0e7ff;
   border-radius: 6px;
   padding: 0.5rem 1rem;
-  color: #334155;
+  color: #6366f1;
   font-weight: 500;
 }
 
@@ -131,17 +137,18 @@
 }
 
 .pg-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 2px solid #e0e7ff;
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
+  transition: all 0.3s ease;
 }
 
 .pg-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+  border-color: #c7d2fe;
+  transform: translateY(-4px);
 }
 
 .card-icon-wrapper {
@@ -155,15 +162,15 @@
 }
 
 .card-icon-blue {
-  background: #eff6ff;
-  border: 1px solid #dbeafe;
-  color: #3b82f6;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  border: 1px solid #c7d2fe;
+  color: #6366f1;
 }
 
 .card-icon-purple {
-  background: #faf5ff;
-  border: 1px solid #f3e8ff;
-  color: #a855f7;
+  background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+  border: 1px solid #e9d5ff;
+  color: #8b5cf6;
 }
 
 .card-icon-neutral {
@@ -200,8 +207,8 @@
 }
 
 .pg-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   background-color: #ffffff;
   color: #1e293b;
   outline: none;
@@ -223,47 +230,47 @@
 
 /* Buttons */
 .pg-btn-primary {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: #ffffff;
   font-weight: 600;
   padding: 0.75rem;
   border-radius: 8px;
   border: none;
   font-size: 0.95rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+  transition: all 0.3s ease;
 }
 
 .pg-btn-primary:hover {
-  background: #2563eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
 }
 
 .pg-btn-outline {
   background-color: #ffffff;
-  color: #475569;
+  color: #6366f1;
   font-weight: 500;
   padding: 0.75rem;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 2px solid #e0e7ff;
   font-size: 0.9rem;
-  transition: all 0.15s ease;
+  transition: all 0.3s ease;
 }
 
 .pg-btn-outline:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+  background: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 100%);
+  border-color: #c7d2fe;
 }
 
 .forgot-password-btn {
   font-size: 0.8rem;
-  color: #3b82f6;
+  color: #6366f1;
   text-decoration: none;
   font-weight: 500;
 }
 
 .forgot-password-btn:hover {
-  color: #2563eb;
+  color: #8b5cf6;
   text-decoration: underline;
 }
 
