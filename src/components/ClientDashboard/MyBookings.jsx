@@ -7,6 +7,8 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewingId, setReviewingId] = useState(null);
 
   useEffect(() => {
@@ -17,7 +19,7 @@ const MyBookings = () => {
     try {
       setLoading(true);
       const res = await API.get("/api/client/bookings");
-      console.log("✅ Bookings loaded:", res.data); // Debug log
+      console.log("✅ Bookings loaded:", res.data);
       setBookings(res.data);
     } catch (err) {
       console.error("❌ Error loading bookings:", err);
@@ -33,13 +35,21 @@ const MyBookings = () => {
       return;
     }
 
+    if (rating === 0) {
+      toast.error("Please select a rating");
+      return;
+    }
+
     try {
       await API.post(`/api/reviews/${bookingId}`, {
         review: reviewText,
+        rating: rating,
       });
       toast.success("Review submitted!");
       setReviewingId(null);
       setReviewText("");
+      setRating(0);
+      setHoveredRating(0);
       loadBookings();
     } catch (err) {
       toast.error(
@@ -48,15 +58,12 @@ const MyBookings = () => {
     }
   };
 
-  // ✅ Format LocalDateTime from backend
   const formatDate = (dateTimeString) => {
     if (!dateTimeString) return "N/A";
     
     try {
-      // Backend sends: "2024-01-15T14:30:00" or "2024-01-15T14:30:00.123"
       const date = new Date(dateTimeString);
       
-      // Check if date is valid
       if (isNaN(date.getTime())) {
         console.warn("Invalid date:", dateTimeString);
         return "Invalid Date";
@@ -69,11 +76,10 @@ const MyBookings = () => {
       });
     } catch (err) {
       console.error("Date formatting error:", err);
-      return dateTimeString; // Return as-is if formatting fails
+      return dateTimeString;
     }
   };
 
-  // ✅ Format date with time
   const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return "N/A";
     
@@ -115,7 +121,6 @@ const MyBookings = () => {
                     {booking.propertyName || "Property"}
                   </h4>
                   
-                  {/* ✅ Display dates properly */}
                   <div className={styles.bookingDatesContainer}>
                     {booking.checkInDate && (
                       <p className={styles.bookingDates}>
@@ -136,14 +141,12 @@ const MyBookings = () => {
                     )}
                   </div>
 
-                  {/* ✅ Show amount if available */}
                   {booking.amount && (
                     <p className={styles.bookingAmount}>
                       Amount: ₹{booking.amount.toFixed(2)}
                     </p>
                   )}
 
-                  {/* ✅ Show tenant info */}
                   {booking.tenantName && (
                     <p className={styles.tenantInfo} style={{ fontSize: '0.9em', marginTop: '4px' }}>
                       Guest: {booking.tenantName}
@@ -164,7 +167,6 @@ const MyBookings = () => {
                 </span>
               </div>
 
-              {/* ✅ Show notes if available */}
               {booking.notes && (
                 <div className={styles.notesSection} style={{ 
                   marginTop: '10px', 
@@ -177,16 +179,61 @@ const MyBookings = () => {
                 </div>
               )}
 
+              {booking.canPay && (
+                <div style={{ marginTop: '12px' }}>
+                  <button
+                    className={styles.primaryBtn}
+                    onClick={() => {
+                      window.location.href = `/payment/${booking.bookingId}`;
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      background: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    💳 Pay Now - ₹{booking.amount?.toFixed(2)}
+                  </button>
+                </div>
+              )}
+
               {booking.canReview && (
                 <div className={styles.reviewSection}>
                   {reviewingId === booking.bookingId ? (
                     <>
+                      <div style={{ marginBottom: '10px' }}>
+                        <label style={{ fontSize: '0.9em', color: '#666', display: 'block', marginBottom: '5px' }}>Rating:</label>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span
+                              key={star}
+                              onClick={() => setRating(star)}
+                              onMouseEnter={() => setHoveredRating(star)}
+                              onMouseLeave={() => setHoveredRating(0)}
+                              style={{
+                                fontSize: '24px',
+                                cursor: 'pointer',
+                                color: star <= (hoveredRating || rating) ? '#fbbf24' : '#d1d5db',
+                                transition: 'color 0.2s',
+                              }}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                       <textarea
                         value={reviewText}
                         onChange={(e) => setReviewText(e.target.value)}
-                        placeholder="Share your experience..."
+                        placeholder="Write a brief one-sentence review about your experience..."
                         className={styles.reviewTextarea}
-                        rows={3}
+                        rows={2}
+                        maxLength={200}
                       />
                       <div className={styles.reviewActions}>
                         <button
@@ -200,6 +247,8 @@ const MyBookings = () => {
                           onClick={() => {
                             setReviewingId(null);
                             setReviewText("");
+                            setRating(0);
+                            setHoveredRating(0);
                           }}
                         >
                           Cancel

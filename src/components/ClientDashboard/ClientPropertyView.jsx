@@ -39,8 +39,15 @@ const ClientPropertyView = () => {
 
       {/* IMAGE */}
       <div className={styles.imageWrapper}>
-        {property.imageUrl ? (
-          <img src={property.imageUrl} alt={property.propertyName} />
+        {(property.imageUrl || property.imageName) ? (
+          <img 
+            src={
+              property.imageUrl 
+                ? (property.imageUrl.startsWith('http') ? property.imageUrl : `http://localhost:8888${property.imageUrl}`)
+                : `http://localhost:8888/api/files/images/${property.imageName}`
+            } 
+            alt={property.propertyName} 
+          />
         ) : (
           <div className={styles.placeholder}>🏠</div>
         )}

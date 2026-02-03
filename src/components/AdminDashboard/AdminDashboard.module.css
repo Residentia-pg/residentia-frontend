@@ -204,7 +204,7 @@
 }
 
 .activityItem {
-  background: #ffffff;
+  background: #b4aced18;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 20px;
@@ -218,7 +218,7 @@
 }
 
 .activityItem h5 {
-  color: #1f2937;
+  color: #153acb;
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 12px;

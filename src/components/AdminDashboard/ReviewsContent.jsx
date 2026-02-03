@@ -69,7 +69,7 @@ const ReviewsContent = () => {
               </div>
 
               <small className="text-muted mb-1">
-                PG: <strong>{review.pg?.propertyName || "N/A"}</strong>
+                PG: <strong>{review.property?.propertyName || "N/A"}</strong>
               </small>
 
               <p className={styles.activityDesc}>

@@ -71,7 +71,7 @@ function App() {
         }
       />
       <Route
-        path="/payment"
+        path="/payment/:bookingId"
         element={
           <ProtectedRoute role="CLIENT">
             <Payment />

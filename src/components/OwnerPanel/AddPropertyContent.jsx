@@ -50,23 +50,25 @@ const AddPropertyContent = () => {
     if (selectedImages.length === 0) return [];
 
     setUploadingImages(true);
-    const uploadedUrls = [];
 
     try {
-      for (const image of selectedImages) {
-        const formData = new FormData();
-        formData.append("file", image);
+      const formData = new FormData();
+      
+      // Append all images to FormData
+      selectedImages.forEach((image) => {
+        formData.append("files", image);
+      });
 
-        const response = await API.post("/api/files/upload", formData, {
-          headers: { "Content-Type": "multipart/form-data" }
-        });
+      const response = await API.post("/api/files/upload-multiple", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
 
-        uploadedUrls.push(response.data.url);
-      }
-
+      // Extract URLs from response
+      const uploadedUrls = response.data.map(item => item.url);
       return uploadedUrls;
     } catch (error) {
       console.error("Failed to upload images:", error);
+      alert(`Image upload failed: ${error.response?.data || error.message}`);
       throw error;
     } finally {
       setUploadingImages(false);
