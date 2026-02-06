@@ -1,10 +1,12 @@
 import axios from "axios";
 
 const API = axios.create({
+
   baseURL: "http://13.235.51.122",
   headers: { "Content-Type": "application/json" },
 });
 
+// Attach JWT to every request
 API.interceptors.request.use((config) => {
   const auth = JSON.parse(localStorage.getItem("pg_auth") || "{}");
   if (auth && auth.token) {
@@ -29,34 +31,38 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If 401 and not already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return API(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return API(originalRequest);
+        });
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        // Use a separate axios instance or clean call to avoid interceptor loops
-        const authData = JSON.parse(localStorage.getItem("pg_auth"));
-        const response = await axios.post(`${API.defaults.baseURL}/auth/refresh`, {
-          refreshToken: authData.refreshToken,
-        });
+        const raw = localStorage.getItem("pg_auth");
+        if (!raw) throw new Error("No refresh token");
+
+        const authData = JSON.parse(raw);
+
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/auth/refresh`,
+          { refreshToken: authData.refreshToken }
+        );
 
         const { token } = response.data;
-        localStorage.setItem("pg_auth", JSON.stringify({ ...authData, token }));
+        localStorage.setItem(
+          "pg_auth",
+          JSON.stringify({ ...authData, token })
+        );
 
         processQueue(null, token);
-        return API(originalRequest); // Retry original request
+        return API(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
         localStorage.removeItem("pg_auth");
